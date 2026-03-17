@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coffee Priority 咖啡療癒工作坊 | 花蓮 Stanley</title>
+<meta name="description" content="SCA Q Grader 認證 × 花蓮精品烘豆 × 銀髮認知活化。咖啡製作融合感官療癒，幫助延緩認知退化。6週銀髮咖啡師班 NT$3,800，機構咖啡角規劃顧問服務。">
+<meta property="og:title" content="Coffee Priority 咖啡療癒工作坊 | 花蓮 Stanley">
+<meta property="og:description" content="SCA Q Grader 認證 × 花蓮精品烘豆 × 銀髮認知活化。一杯咖啡的距離，是最短的陪伴。">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="zh_TW">
+<meta name="keywords" content="咖啡療癒,銀髮咖啡師,認知活化,花蓮咖啡,SCA Q Grader,長照咖啡,Coffee Priority">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+/* ─── 浮動 LINE 按鈕 ─── */
+.fab-line {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 999;
+  background: #06C755;
+  color: #fff;
+  border-radius: 50px;
+  padding: 14px 22px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 6px 24px rgba(6,199,85,0.45);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.fab-line:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 32px rgba(6,199,85,0.55);
+}
+.fab-line svg { width: 22px; height: 22px; fill: #fff; flex-shrink: 0; }
+
+/* ─── 學員見證 ─── */
+.testimonial-card {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  box-shadow: 0 4px 20px var(--shadow);
+  position: relative;
+}
+.testimonial-card::before {
+  content: '"';
+  font-family: 'Playfair Display', serif;
+  font-size: 80px;
+  color: var(--earth);
+  opacity: 0.2;
+  position: absolute;
+  top: 8px;
+  left: 20px;
+  line-height: 1;
+}
+.testimonial-text {
+  font-size: 15px;
+  color: #555;
+  line-height: 1.8;
+  margin-bottom: 20px;
+  padding-top: 24px;
+}
+.testimonial-author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.testimonial-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--earth), var(--bark));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.testimonial-name { font-weight: 600; color: var(--forest-deep); font-size: 14px; }
+.testimonial-role { font-size: 12px; color: #888; }
+
+/* ─── FAQ ─── */
+.faq-item {
+  background: #fff;
+  border-radius: var(--radius);
+  margin-bottom: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px var(--shadow);
+}
+.faq-question {
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 20px 24px;
+  text-align: left;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--forest-deep);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Noto Sans TC', sans-serif;
+  transition: background 0.2s;
+}
+.faq-question:hover { background: var(--mist); }
+.faq-question .faq-icon {
+  font-size: 20px;
+  color: var(--earth);
+  transition: transform 0.3s;
+  flex-shrink: 0;
+}
+.faq-question.open .faq-icon { transform: rotate(45deg); }
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s ease, padding 0.2s;
+  padding: 0 24px;
+  font-size: 14px;
+  color: #555;
+  line-height: 1.8;
+}
+.faq-answer.open {
+  max-height: 300px;
+  padding: 0 24px 20px;
+}
+
+/* ─── 限額提示 ─── */
+.quota-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff8e6;
+  color: #b45309;
+  border: 1.5px solid #fcd34d;
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.quota-dot {
+  width: 7px;
+  height: 7px;
+  background: #f59e0b;
+  border-radius: 50%;
+  animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* ─── 統計數字區塊 ─── */
+.stats-bar {
+  background: linear-gradient(135deg, var(--bark) 0%, var(--earth) 100%);
+  padding: 40px 24px;
+}
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 24px;
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+.stat-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 40px;
+  color: #fff;
+  font-weight: 700;
+  line-height: 1;
+}
+.stat-label {
+  font-size: 13px;
+  color: rgba(255,255,255,0.8);
+  margin-top: 6px;
+}
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "Coffee Priority 咖啡療癒工作坊",
+  "description": "SCA Q Grader 認證，結合銀髮認知活化的咖啡療癒課程",
+  "address": {
+    "@type": "PostalAddress",
+    "addressRegion": "花蓮縣",
+    "addressCountry": "TW"
+  },
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": "咖啡療癒課程",
+    "itemListElement": [
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Course",
+          "name": "銀髮咖啡師初級班",
+          "description": "6週課程，從認識咖啡豆到手沖實作，融入認知活化訓練"
+        },
+        "price": "3800",
+        "priceCurrency": "TWD"
+      }
+    ]
+  }
+}
+</script>
+</head>
+<body>
+<div id="navbar"></div>
+
+<!-- Hero -->
+<section class="hero fade-up" style="background:linear-gradient(135deg,var(--bark) 0%,var(--earth) 100%);min-height:400px;">
+  <div class="container hero-content">
+    <div class="hero-tag">COFFEE PRIORITY</div>
+    <h1>咖啡療癒工作坊</h1>
+    <p>SCA Q Grader 認證 × 精品烘豆 × 銀髮認知活化<br>「一杯咖啡的距離，是最短的陪伴」</p>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:24px;">
+      <a href="/training.html" class="btn btn-white">查看工作坊課程</a>
+      <a href="/shop.html?cat=coffee" class="btn" style="background:rgba(255,255,255,0.2);color:#fff;border:1.5px solid rgba(255,255,255,0.5);">選購咖啡豆 →</a>
+    </div>
+  </div>
+</section>
+
+<!-- 統計數字 -->
+<div class="stats-bar">
+  <div class="stats-grid">
+    <div>
+      <div class="stat-num">200+</div>
+      <div class="stat-label">學員結業人數</div>
+    </div>
+    <div>
+      <div class="stat-num">12+</div>
+      <div class="stat-label">合作護理機構</div>
+    </div>
+    <div>
+      <div class="stat-num">SCA</div>
+      <div class="stat-label">Q Grader 認證師資</div>
+    </div>
+    <div>
+      <div class="stat-num">6週</div>
+      <div class="stat-label">系統性課程設計</div>
+    </div>
+  </div>
+</div>
+
+<!-- 為什麼是咖啡療癒 -->
+<section class="section">
+  <div class="container">
+    <div class="section-header fade-up">
+      <div class="section-tag">COFFEE AS THERAPY</div>
+      <h2>為什麼是咖啡療癒？</h2>
+      <p>研究顯示，咖啡製作過程中的感官刺激、手部精細動作訓練，對延緩認知退化具有顯著效果</p>
+    </div>
+    <div class="grid-3">
+      <div class="card fade-up fade-up-1" style="text-align:center;">
+        <div style="font-size:48px;margin-bottom:16px;">👃</div>
+        <h3 style="color:var(--forest-deep);margin-bottom:8px;">嗅覺刺激</h3>
+        <p style="color:#666;font-size:14px;">咖啡香氣刺激大腦嗅覺皮質，有助激活海馬迴記憶功能</p>
+      </div>
+      <div class="card fade-up fade-up-2" style="text-align:center;">
+        <div style="font-size:48px;margin-bottom:16px;">✋</div>
+        <h3 style="color:var(--forest-deep);margin-bottom:8px;">手部精細訓練</h3>
+        <p style="color:#666;font-size:14px;">研磨、手沖、拉花等動作，有效訓練手部精細動作與專注力</p>
+      </div>
+      <div class="card fade-up fade-up-3" style="text-align:center;">
+        <div style="font-size:48px;margin-bottom:16px;">🤝</div>
+        <h3 style="color:var(--forest-deep);margin-bottom:8px;">社交互動</h3>
+        <p style="color:#666;font-size:14px;">咖啡是天然的社交媒介，促進代間溝通，減少孤獨感</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 課程項目 -->
+<section class="section" style="background:var(--mist);">
+  <div class="container">
+    <div class="section-header fade-up">
+      <div class="section-tag">PROGRAMS</div>
+      <h2>Coffee Priority 課程項目</h2>
+    </div>
+    <div class="grid-2">
+      <div class="card fade-up fade-up-1">
+        <div style="background:linear-gradient(135deg,var(--earth),var(--bark));border-radius:8px;padding:20px;margin-bottom:20px;color:#fff;text-align:center;font-size:40px;">☕</div>
+        <div style="margin-bottom:10px;">
+          <span class="quota-badge"><span class="quota-dot"></span>本期剩 4 個名額</span>
+        </div>
+        <h3 style="color:var(--forest-deep);margin-bottom:8px;">銀髮咖啡師初級班</h3>
+        <p style="color:#666;font-size:14px;margin-bottom:16px;">6週課程，每週六上午 09:00-11:00。從認識咖啡豆到手沖實作，融入認知活化訓練。</p>
+        <ul style="font-size:13px;color:#555;margin-bottom:20px;padding-left:18px;line-height:2;">
+          <li>SCA 認證師資授課</li>
+          <li>小班制（最多 8 人）</li>
+          <li>結業頒發學習證明</li>
+          <li>家屬一同參與，免費旁聽一堂</li>
+        </ul>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span class="price">NT$3,800</span>
+          <a href="/training.html" class="btn btn-primary" style="padding:8px 20px;">立即報名</a>
+        </div>
+      </div>
+      <div class="card fade-up fade-up-2">
+        <div style="background:linear-gradient(135deg,var(--forest-mid),var(--forest-deep));border-radius:8px;padding:20px;margin-bottom:20px;color:#fff;text-align:center;font-size:40px;">🏥</div>
+        <h3 style="color:var(--forest-deep);margin-bottom:8px;">機構咖啡角規劃顧問</h3>
+        <p style="color:#666;font-size:14px;margin-bottom:16px;">協助護理之家設計療癒咖啡空間，包含設備選型、操作訓練、活動設計。</p>
+        <ul style="font-size:13px;color:#555;margin-bottom:20px;padding-left:18px;line-height:2;">
+          <li>現場勘查 + 空間規劃建議</li>
+          <li>設備採購清單（含預算控管）</li>
+          <li>工作人員操作培訓（2天）</li>
+          <li>3個月後訪視追蹤</li>
+        </ul>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span class="price">NT$15,000 <span class="price-unit">起/案</span></span>
+          <a href="/consulting.html" class="btn btn-primary" style="padding:8px 20px;">諮詢顧問</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 學員見證 -->
+<section class="section">
+  <div class="container">
+    <div class="section-header fade-up">
+      <div class="section-tag">TESTIMONIALS</div>
+      <h2>學員 & 合作機構回饋</h2>
+    </div>
+    <div class="grid-3">
+      <div class="testimonial-card fade-up fade-up-1">
+        <p class="testimonial-text">媽媽參加課程後，每天早上都期待去「上咖啡課」，連我們都感覺到她的精神好了很多，手也更靈活了。</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">👩</div>
+          <div>
+            <div class="testimonial-name">陳小姐（學員家屬）</div>
+            <div class="testimonial-role">花蓮市 · 銀髮咖啡師班第 3 期</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card fade-up fade-up-2">
+        <p class="testimonial-text">引進咖啡角之後，住民的下午時光有了新重心。活動參與率提升將近 40%，家屬滿意度也跟著上來了。</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">👨</div>
+          <div>
+            <div class="testimonial-name">王主任（護理之家）</div>
+            <div class="testimonial-role">宜蘭 · 機構咖啡角規劃合作</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card fade-up fade-up-3">
+        <p class="testimonial-text">Stanley 老師的教法很有耐心，從零開始教我們手沖，還解釋每個步驟背後的意義，我 70 歲才知道咖啡這麼有學問！</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">🧓</div>
+          <div>
+            <div class="testimonial-name">李阿公（學員）</div>
+            <div class="testimonial-role">壽豐鄉 · 銀髮咖啡師班第 5 期</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 花蓮精品咖啡豆 -->
+<section class="section" style="background:var(--mist);">
+  <div class="container" style="text-align:center;">
+    <div class="section-tag" style="color:var(--earth);">COFFEE PRIORITY BEANS</div>
+    <h2 style="color:var(--forest-deep);margin-bottom:16px;">花蓮精品咖啡豆</h2>
+    <p style="color:#666;margin-bottom:32px;max-width:480px;margin-left:auto;margin-right:auto;">SCA Q Grader 親自杯測，嚴選宜花東在地莊園豆，自家烘焙。每批次限量，確保新鮮風味。</p>
+    <a href="/shop.html?cat=coffee" class="btn btn-primary">選購咖啡豆 →</a>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section">
+  <div class="container" style="max-width:760px;">
+    <div class="section-header fade-up">
+      <div class="section-tag">FAQ</div>
+      <h2>常見問題</h2>
+    </div>
+    <div class="fade-up">
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          課程適合沒有咖啡基礎的長輩嗎？
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          完全適合！課程從零開始，師資具備長照背景，教學節奏特別為銀髮學員設計。無需任何咖啡或烹飪經驗，只要有興趣就可以報名。
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          家屬可以一起參加嗎？
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          可以！我們鼓勵家屬陪同，每位學員可邀請家屬免費旁聽一堂課。一起學咖啡，是很好的代間共學體驗。
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          機構顧問服務適合什麼規模的機構？
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          從 10 床的小型護理之家到 200 床以上的大型機構都有服務過。我們會依照機構的空間、預算和人員配置，量身規劃合適的方案。
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          咖啡豆是花蓮本地種的嗎？
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          是的！主要嚴選宜花東在地莊園豆，包含花蓮富里、壽豐等高海拔產區。每批次由 SCA Q Grader 親自杯測，確保品質穩定。
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          如何報名或進一步諮詢？
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          可以點選各課程的「立即報名」或「諮詢顧問」按鈕，或直接點右下角的 LINE 按鈕與我們聯繫，通常會在 24 小時內回覆。
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 浮動 LINE 按鈕 -->
+<a href="https://line.me/ti/p/~stanleyhealthcare" target="_blank" rel="noopener" class="fab-line">
+  <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><path d="M24 4C12.954 4 4 11.85 4 21.5c0 5.784 3.29 10.907 8.42 14.2-.37 1.38-1.34 5.01-1.53 5.79-.24.97.35 1.96 1.3 2.33.28.11.57.16.86.16.72 0 1.42-.28 1.94-.8L21.4 37c.84.1 1.7.15 2.6.15 11.046 0 20-7.85 20-17.5S35.046 4 24 4z"/></svg>
+  LINE 快速諮詢
+</a>
+
+<div id="footer"></div>
+<script src="/js/components.js"></script>
+<script>
+function toggleFaq(btn) {
+  const answer = btn.nextElementSibling;
+  const isOpen = answer.classList.contains('open');
+  // 關閉所有
+  document.querySelectorAll('.faq-answer').forEach(a => a.classList.remove('open'));
+  document.querySelectorAll('.faq-question').forEach(b => b.classList.remove('open'));
+  // 如果原本是關閉的，就開啟
+  if (!isOpen) {
+    answer.classList.add('open');
+    btn.classList.add('open');
+  }
+}
+</script>
+</body>
+</html>

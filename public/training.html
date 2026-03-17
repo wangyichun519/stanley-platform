@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>教育訓練課程 | Stanley 健康生活顧問</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+.course-card { cursor: pointer; }
+.course-card .cat-badge { font-size:11px; padding:3px 10px; border-radius:12px; display:inline-block; margin-bottom:12px; }
+.cat-dementia { background:#fde8f0; color:#b83060; }
+.cat-coffee   { background:#f5edd5; color:var(--earth); }
+.cat-caregiver{ background:#e8f5e8; color:var(--forest-deep); }
+.cat-infection{ background:#e8f0ff; color:#3050b8; }
+.cat-tcm      { background:#f5f0e8; color:var(--bark); }
+.cat-general  { background:var(--mist); color:#555; }
+.course-card h3 { font-size:17px; color:var(--forest-deep); margin-bottom:8px; }
+.course-meta { display:grid; grid-template-columns:1fr 1fr; gap:4px; margin:12px 0; font-size:13px; color:#666; }
+.course-meta span::before { margin-right:4px; }
+.seats-bar { background:#eee; border-radius:4px; height:6px; margin-top:12px; }
+.seats-fill { background:var(--forest-mid); border-radius:4px; height:6px; transition:width 0.5s; }
+.seats-fill.almost { background:var(--earth); }
+.seats-fill.full { background:#e74c3c; }
+
+/* Modal */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:200; align-items:center; justify-content:center; padding:16px; }
+.modal-overlay.active { display:flex; }
+.modal { background:#fff; border-radius:var(--radius-lg); padding:36px; max-width:520px; width:100%; max-height:90vh; overflow-y:auto; }
+.modal h3 { color:var(--forest-deep); margin-bottom:6px; }
+.modal .course-info { background:var(--mist); border-radius:var(--radius); padding:16px; margin-bottom:24px; font-size:14px; }
+.modal .course-info p { margin-bottom:4px; }
+.filter-tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:28px; }
+.filter-tab { padding:8px 18px; border-radius:20px; border:1.5px solid #ddd; background:#fff; cursor:pointer; font-size:13px; transition:var(--transition); }
+.filter-tab.active { border-color:var(--forest-deep); background:var(--forest-deep); color:#fff; }
+</style>
+</head>
+<body>
+<div id="navbar"></div>
+
+<section class="hero" style="min-height:300px;">
+  <div class="container hero-content">
+    <div class="hero-tag">TRAINING PROGRAMS</div>
+    <h1>教育訓練課程</h1>
+    <p>失智照護 × 照服員培訓 × 感控課程 × 銀髮咖啡師 × 漢方養生工作坊</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <!-- 篩選 -->
+    <div class="filter-tabs">
+      <button class="filter-tab active" onclick="filterCourses('all', this)">全部課程</button>
+      <button class="filter-tab" onclick="filterCourses('dementia', this)">失智照護</button>
+      <button class="filter-tab" onclick="filterCourses('caregiver', this)">照服員</button>
+      <button class="filter-tab" onclick="filterCourses('infection', this)">感染控制</button>
+      <button class="filter-tab" onclick="filterCourses('coffee', this)">咖啡療癒</button>
+      <button class="filter-tab" onclick="filterCourses('tcm', this)">漢方養生</button>
+    </div>
+
+    <div class="grid-3" id="courseGrid">
+      <div style="grid-column:1/-1;text-align:center;padding:40px;color:#888;">載入課程中...</div>
+    </div>
+  </div>
+</section>
+
+<!-- 報名 Modal -->
+<div class="modal-overlay" id="registerModal">
+  <div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <h3>🎓 課程報名</h3>
+      <button onclick="closeModal()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#999;">×</button>
+    </div>
+    <div class="course-info" id="modalCourseInfo"></div>
+    <form id="registerForm">
+      <input type="hidden" id="reg_course_id">
+      <div class="form-group">
+        <label class="form-label">姓名<span class="required">*</span></label>
+        <input type="text" class="form-control" id="reg_name" required>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div class="form-group">
+          <label class="form-label">聯絡電話<span class="required">*</span></label>
+          <input type="tel" class="form-control" id="reg_phone" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email<span class="required">*</span></label>
+          <input type="email" class="form-control" id="reg_email" required>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div class="form-group">
+          <label class="form-label">職業別</label>
+          <select class="form-control" id="reg_occupation">
+            <option value="照服員">照服員</option>
+            <option value="護理師">護理師</option>
+            <option value="家屬">家屬</option>
+            <option value="一般民眾">一般民眾</option>
+            <option value="其他">其他</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">身分證後4碼（收據用）</label>
+          <input type="text" class="form-control" id="reg_id" maxlength="4" placeholder="1234">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">任職機構（選填）</label>
+        <input type="text" class="form-control" id="reg_org" placeholder="機構名稱">
+      </div>
+      <div class="form-group" style="display:flex;align-items:center;gap:12px;">
+        <input type="checkbox" id="reg_receipt" style="width:18px;height:18px;">
+        <label for="reg_receipt" style="font-size:14px;cursor:pointer;">需要開立收據</label>
+      </div>
+      <div class="form-group" id="receiptTitleGroup" style="display:none;">
+        <label class="form-label">收據抬頭</label>
+        <input type="text" class="form-control" id="reg_receipt_title" placeholder="收據抬頭">
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;" id="regSubmitBtn">
+        💳 確認報名並前往付款
+      </button>
+    </form>
+  </div>
+</div>
+
+<div id="footer"></div>
+<script src="/js/components.js"></script>
+<script>
+let allCourses = [];
+let selectedCourse = null;
+
+const catMap = {
+  dementia: { label:'失智照護', cls:'cat-dementia' },
+  coffee:   { label:'咖啡療癒', cls:'cat-coffee' },
+  caregiver:{ label:'照服員培訓', cls:'cat-caregiver' },
+  infection:{ label:'感染控制', cls:'cat-infection' },
+  tcm:      { label:'漢方養生', cls:'cat-tcm' },
+  general:  { label:'一般課程', cls:'cat-general' }
+};
+
+async function loadCourses() {
+  allCourses = await apiGet('/api/training/courses');
+  renderCourses(allCourses);
+}
+
+function renderCourses(courses) {
+  const grid = document.getElementById('courseGrid');
+  if (!courses.length) { grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#888;">目前無開放課程</div>'; return; }
+  grid.innerHTML = courses.map(c => {
+    const cat = catMap[c.category] || catMap.general;
+    const pct = Math.round(c.registered / c.capacity * 100);
+    const fillCls = pct >= 100 ? 'full' : pct >= 80 ? 'almost' : '';
+    const seatsLeft = c.capacity - c.registered;
+    return `
+    <div class="card course-card" onclick="openModal(${c.id})">
+      <span class="cat-badge ${cat.cls}">${cat.label}</span>
+      <h3>${c.title}</h3>
+      <p style="color:#666;font-size:13px;margin-bottom:12px;">${c.description?.slice(0,60)}...</p>
+      <div class="course-meta">
+        <span>📅 ${c.date}</span>
+        <span>⏰ ${c.time || '-'}</span>
+        <span>📍 ${c.location}</span>
+        <span>⏱️ ${c.duration_hours}小時</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;">
+        <span class="price">NT$${c.price.toLocaleString()}</span>
+        <span class="badge ${seatsLeft <= 0 ? 'badge-red' : seatsLeft <= 5 ? 'badge-earth' : 'badge-green'}">
+          ${seatsLeft <= 0 ? '名額已滿' : `剩 ${seatsLeft} 名`}
+        </span>
+      </div>
+      <div class="seats-bar"><div class="seats-fill ${fillCls}" style="width:${Math.min(pct,100)}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function filterCourses(cat, btn) {
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  const filtered = cat === 'all' ? allCourses : allCourses.filter(c => c.category === cat);
+  renderCourses(filtered);
+}
+
+function openModal(id) {
+  selectedCourse = allCourses.find(c => c.id === id);
+  if (!selectedCourse || selectedCourse.registered >= selectedCourse.capacity) {
+    showToast('此課程名額已滿', 'error'); return;
+  }
+  document.getElementById('reg_course_id').value = id;
+  document.getElementById('modalCourseInfo').innerHTML = `
+    <p><strong>${selectedCourse.title}</strong></p>
+    <p>📅 ${selectedCourse.date} ${selectedCourse.time || ''} ｜ 📍 ${selectedCourse.location}</p>
+    <p>費用：<strong style="color:var(--earth)">NT$${selectedCourse.price.toLocaleString()}</strong></p>
+  `;
+  document.getElementById('registerModal').classList.add('active');
+}
+function closeModal() { document.getElementById('registerModal').classList.remove('active'); }
+
+document.getElementById('reg_receipt').addEventListener('change', function() {
+  document.getElementById('receiptTitleGroup').style.display = this.checked ? 'block' : 'none';
+});
+
+document.getElementById('registerForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('regSubmitBtn');
+  btn.textContent = '處理中...'; btn.disabled = true;
+
+  const data = {
+    course_id: document.getElementById('reg_course_id').value,
+    name: document.getElementById('reg_name').value,
+    id_last4: document.getElementById('reg_id').value,
+    phone: document.getElementById('reg_phone').value,
+    email: document.getElementById('reg_email').value,
+    occupation: document.getElementById('reg_occupation').value,
+    org: document.getElementById('reg_org').value,
+    need_receipt: document.getElementById('reg_receipt').checked,
+    receipt_title: document.getElementById('reg_receipt_title').value
+  };
+
+  const result = await apiPost('/api/training/register', data);
+  if (result.success) {
+    // 發起 LINE Pay
+    const payResult = await apiPost('/api/linepay/request', {
+      amount: selectedCourse.price,
+      orderId: `TRN${result.registration_id}_${Date.now()}`,
+      orderType: 'training',
+      productName: selectedCourse.title
+    });
+    if (payResult.success) {
+      window.location.href = payResult.paymentUrl;
+    } else {
+      showToast('金流建立失敗，請稍後再試', 'error');
+    }
+  } else {
+    showToast('❌ ' + result.message, 'error');
+  }
+  btn.textContent = '💳 確認報名並前往付款'; btn.disabled = false;
+});
+
+loadCourses();
+</script>
+</body>
+</html>

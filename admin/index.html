@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>後台管理 | Stanley 健康生活顧問</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+:root {
+  --green:#2D4A2D; --green-mid:#4A7A4A; --earth:#8B6914;
+  --cream:#F5F0E8; --mist:#E8EDE5; --shadow:rgba(45,74,45,0.12);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Noto Sans TC',sans-serif; background:#f0f2f0; color:#333; }
+.admin-nav { background:var(--green); padding:0 24px; height:60px; display:flex; align-items:center; justify-content:space-between; }
+.admin-nav .brand { color:#fff; font-size:17px; font-weight:700; }
+.admin-nav .nav-links { display:flex; gap:4px; }
+.nav-tab { background:none; border:none; color:rgba(255,255,255,0.75); padding:8px 16px; border-radius:6px; cursor:pointer; font-size:14px; font-family:'Noto Sans TC',sans-serif; transition:0.2s; }
+.nav-tab:hover,.nav-tab.active { background:rgba(255,255,255,0.15); color:#fff; }
+.content { padding:24px; max-width:1200px; margin:0 auto; }
+.stats-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:16px; margin-bottom:28px; }
+.stat-card { background:#fff; border-radius:12px; padding:20px; box-shadow:0 2px 12px var(--shadow); }
+.stat-card .label { font-size:12px; color:#888; margin-bottom:6px; }
+.stat-card .num { font-size:32px; font-weight:700; color:var(--green); }
+.stat-card .sub { font-size:12px; color:#aaa; margin-top:4px; }
+.section-card { background:#fff; border-radius:12px; padding:24px; box-shadow:0 2px 12px var(--shadow); margin-bottom:20px; display:none; }
+.section-card.active { display:block; }
+.section-card h3 { font-size:18px; color:var(--green); margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th { text-align:left; padding:10px 12px; background:var(--mist); color:var(--green); font-weight:600; }
+td { padding:10px 12px; border-bottom:1px solid #f0f0f0; }
+tr:hover td { background:#fafcfa; }
+.status-badge { display:inline-block; padding:3px 10px; border-radius:12px; font-size:11px; font-weight:600; }
+.s-pending  { background:#fff3e0; color:#e65c00; }
+.s-paid     { background:#e8f5e8; color:var(--green); }
+.s-confirmed{ background:#e8f0ff; color:#3050b8; }
+.s-completed{ background:var(--mist); color:#555; }
+.btn { padding:8px 16px; border-radius:6px; border:none; cursor:pointer; font-size:13px; font-family:'Noto Sans TC',sans-serif; transition:0.2s; }
+.btn-sm { padding:5px 12px; font-size:12px; }
+.btn-green { background:var(--green); color:#fff; }
+.btn-green:hover { background:var(--green-mid); }
+.btn-earth { background:var(--earth); color:#fff; }
+.export-btn { background:var(--earth); color:#fff; border:none; padding:8px 18px; border-radius:8px; cursor:pointer; font-size:13px; font-family:'Noto Sans TC',sans-serif; }
+select.inline { border:1.5px solid #ddd; border-radius:6px; padding:4px 8px; font-size:12px; }
+</style>
+</head>
+<body>
+<div class="admin-nav">
+  <div class="brand">🌿 Stanley 健康生活顧問 ｜ 後台管理</div>
+  <div class="nav-links">
+    <button class="nav-tab active" onclick="showTab('dashboard')">Dashboard</button>
+    <button class="nav-tab" onclick="showTab('consulting')">顧問預約</button>
+    <button class="nav-tab" onclick="showTab('training')">課程報名</button>
+    <button class="nav-tab" onclick="showTab('shop')">商店訂單</button>
+    <button class="nav-tab" onclick="showTab('courses')">課程管理</button>
+    <a href="/" style="color:rgba(255,255,255,0.7);font-size:13px;padding:8px 16px;text-decoration:none;">← 前台</a>
+  </div>
+</div>
+
+<div class="content">
+  <!-- Dashboard -->
+  <div class="section-card active" id="tab-dashboard">
+    <div class="stats-row" id="statsRow">
+      <div class="stat-card"><div class="label">待處理顧問預約</div><div class="num" id="s1">-</div></div>
+      <div class="stat-card"><div class="label">本月課程收入</div><div class="num" id="s2">-</div><div class="sub">付款完成</div></div>
+      <div class="stat-card"><div class="label">待處理訂單</div><div class="num" id="s3">-</div></div>
+      <div class="stat-card"><div class="label">本月商店收入</div><div class="num" id="s4">-</div></div>
+      <div class="stat-card"><div class="label">總會員數</div><div class="num" id="s5">-</div></div>
+    </div>
+    <div style="color:#888;text-align:center;padding:20px;">
+      <p>🌿 歡迎回來，Stanley！今天也是照護的美好一天。</p>
+      <p style="font-size:12px;margin-top:8px;">使用上方分頁管理各項業務</p>
+    </div>
+  </div>
+
+  <!-- 顧問預約 -->
+  <div class="section-card" id="tab-consulting">
+    <h3>顧問預約管理 <button class="export-btn" onclick="exportTable('consultingTable')">匯出 Excel</button></h3>
+    <table id="consultingTable">
+      <thead><tr><th>時間</th><th>機構/姓名</th><th>聯絡人</th><th>電話</th><th>服務類型</th><th>緊急</th><th>狀態</th><th>操作</th></tr></thead>
+      <tbody id="consultingBody"><tr><td colspan="8" style="text-align:center;padding:20px;color:#aaa;">載入中...</td></tr></tbody>
+    </table>
+  </div>
+
+  <!-- 課程報名 -->
+  <div class="section-card" id="tab-training">
+    <h3>課程報名管理 <button class="export-btn" onclick="exportTable('trainingTable')">匯出 Excel</button></h3>
+    <table id="trainingTable">
+      <thead><tr><th>時間</th><th>課程</th><th>課程日期</th><th>姓名</th><th>電話</th><th>職業</th><th>付款</th><th>需收據</th></tr></thead>
+      <tbody id="trainingBody"><tr><td colspan="8" style="text-align:center;padding:20px;color:#aaa;">載入中...</td></tr></tbody>
+    </table>
+  </div>
+
+  <!-- 商店訂單 -->
+  <div class="section-card" id="tab-shop">
+    <h3>選物商店訂單 <button class="export-btn" onclick="exportTable('shopTable')">匯出 Excel</button></h3>
+    <table id="shopTable">
+      <thead><tr><th>訂單編號</th><th>時間</th><th>客戶</th><th>電話</th><th>金額</th><th>配送</th><th>付款狀態</th><th>操作</th></tr></thead>
+      <tbody id="shopBody"><tr><td colspan="8" style="text-align:center;padding:20px;color:#aaa;">載入中...</td></tr></tbody>
+    </table>
+  </div>
+
+  <!-- 課程管理 -->
+  <div class="section-card" id="tab-courses">
+    <h3>課程管理</h3>
+    <details style="margin-bottom:20px;background:var(--mist);border-radius:8px;padding:16px;">
+      <summary style="cursor:pointer;font-weight:600;color:var(--green);">＋ 新增課程</summary>
+      <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:12px;" id="addCourseForm">
+        <input class="fc" placeholder="課程名稱*" id="nc_title">
+        <input class="fc" placeholder="日期 (YYYY-MM-DD)*" id="nc_date">
+        <input class="fc" placeholder="時間 (09:00-12:00)" id="nc_time">
+        <input class="fc" placeholder="地點" id="nc_location">
+        <input class="fc" type="number" placeholder="費用*" id="nc_price">
+        <input class="fc" type="number" placeholder="名額上限*" id="nc_capacity">
+        <input class="fc" type="number" placeholder="時數" id="nc_hours">
+        <select class="fc" id="nc_cat">
+          <option value="general">一般</option>
+          <option value="dementia">失智照護</option>
+          <option value="caregiver">照服員</option>
+          <option value="infection">感染控制</option>
+          <option value="coffee">咖啡療癒</option>
+          <option value="tcm">漢方養生</option>
+        </select>
+        <textarea class="fc" placeholder="課程描述" id="nc_desc" style="grid-column:1/-1;resize:vertical;min-height:80px;"></textarea>
+        <button onclick="addCourse()" class="btn btn-green" style="grid-column:1/-1;">新增課程</button>
+      </div>
+    </details>
+    <table>
+      <thead><tr><th>課程名稱</th><th>日期</th><th>費用</th><th>名額</th><th>已報名</th><th>狀態</th></tr></thead>
+      <tbody id="coursesBody"><tr><td colspan="6" style="text-align:center;padding:20px;color:#aaa;">載入中...</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<style>
+.fc { border:1.5px solid #ddd; border-radius:6px; padding:10px 12px; font-size:14px; font-family:'Noto Sans TC',sans-serif; width:100%; }
+.fc:focus { outline:none; border-color:var(--green-mid); }
+</style>
+
+<script>
+const statusMap = {
+  pending: '<span class="status-badge s-pending">待處理</span>',
+  confirmed: '<span class="status-badge s-confirmed">已確認</span>',
+  paid: '<span class="status-badge s-paid">已付款</span>',
+  completed: '<span class="status-badge s-completed">已完成</span>'
+};
+
+function showTab(tab) {
+  document.querySelectorAll('.section-card').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(`tab-${tab}`).classList.add('active');
+  event.target.classList.add('active');
+  if (tab === 'consulting') loadConsulting();
+  if (tab === 'training') loadTraining();
+  if (tab === 'shop') loadShop();
+  if (tab === 'courses') loadCourses();
+}
+
+async function loadDashboard() {
+  try {
+    const r = await fetch('/api/admin/dashboard');
+    const d = await r.json();
+    document.getElementById('s1').textContent = d.consulting_pending;
+    document.getElementById('s2').textContent = `NT$${d.training_revenue_month?.toLocaleString()||0}`;
+    document.getElementById('s3').textContent = d.orders_pending;
+    document.getElementById('s4').textContent = `NT$${d.orders_revenue_month?.toLocaleString()||0}`;
+    document.getElementById('s5').textContent = d.members_total;
+  } catch(e) { console.log('Stats load error:', e); }
+}
+
+async function loadConsulting() {
+  const data = await (await fetch('/api/consulting/list')).json();
+  document.getElementById('consultingBody').innerHTML = data.map(r => `
+    <tr>
+      <td>${r.created_at?.slice(0,10)}</td>
+      <td>${r.org_name}</td>
+      <td>${r.contact_name||'-'}</td>
+      <td>${r.phone}</td>
+      <td>${r.service_type}</td>
+      <td>${r.urgent ? '⚡急件' : '-'}</td>
+      <td>${statusMap[r.status]||r.status}</td>
+      <td>
+        <select class="inline" onchange="updateConsulting(${r.id}, this.value)">
+          <option ${r.status==='pending'?'selected':''} value="pending">待處理</option>
+          <option ${r.status==='confirmed'?'selected':''} value="confirmed">已確認</option>
+          <option ${r.status==='paid'?'selected':''} value="paid">已付款</option>
+          <option ${r.status==='completed'?'selected':''} value="completed">已完成</option>
+        </select>
+      </td>
+    </tr>`).join('');
+}
+
+async function updateConsulting(id, status) {
+  await fetch(`/api/consulting/${id}/status`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify({status}) });
+  alert('狀態已更新');
+}
+
+async function loadTraining() {
+  const data = await (await fetch('/api/training/registrations')).json();
+  document.getElementById('trainingBody').innerHTML = data.map(r => `
+    <tr>
+      <td>${r.created_at?.slice(0,10)}</td>
+      <td>${r.course_title||'-'}</td>
+      <td>${r.course_date||'-'}</td>
+      <td>${r.name}</td>
+      <td>${r.phone}</td>
+      <td>${r.occupation||'-'}</td>
+      <td>${r.payment_status==='paid'?'<span class="status-badge s-paid">已付款</span>':'<span class="status-badge s-pending">待付款</span>'}</td>
+      <td>${r.need_receipt?'✅ '+r.receipt_title:'-'}</td>
+    </tr>`).join('');
+}
+
+async function loadShop() {
+  const data = await (await fetch('/api/shop/orders')).json();
+  document.getElementById('shopBody').innerHTML = data.map(o => `
+    <tr>
+      <td style="font-size:11px;">${o.order_no}</td>
+      <td>${o.created_at?.slice(0,10)}</td>
+      <td>${o.customer_name}</td>
+      <td>${o.phone}</td>
+      <td>NT$${o.total?.toLocaleString()}</td>
+      <td>${o.shipping_method==='delivery'?'宅配':'門市取貨'}</td>
+      <td>${o.payment_status==='paid'?'<span class="status-badge s-paid">已付款</span>':'<span class="status-badge s-pending">待付款</span>'}</td>
+      <td><button class="btn btn-sm btn-green" onclick="markPaid('${o.id}')">標記付款</button></td>
+    </tr>`).join('');
+}
+
+async function markPaid(id) {
+  await fetch(`/api/shop/orders/${id}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify({payment_status:'paid'}) });
+  loadShop();
+}
+
+async function loadCourses() {
+  const data = await (await fetch('/api/training/courses')).json();
+  document.getElementById('coursesBody').innerHTML = data.map(c => `
+    <tr>
+      <td>${c.title}</td>
+      <td>${c.date}</td>
+      <td>NT$${c.price?.toLocaleString()}</td>
+      <td>${c.capacity}</td>
+      <td>${c.registered||0}</td>
+      <td>${c.status==='open'?'<span class="status-badge s-paid">開放</span>':'<span class="status-badge s-pending">關閉</span>'}</td>
+    </tr>`).join('');
+}
+
+async function addCourse() {
+  const data = {
+    title: document.getElementById('nc_title').value,
+    date: document.getElementById('nc_date').value,
+    time: document.getElementById('nc_time').value,
+    location: document.getElementById('nc_location').value,
+    price: parseInt(document.getElementById('nc_price').value),
+    capacity: parseInt(document.getElementById('nc_capacity').value),
+    duration_hours: parseInt(document.getElementById('nc_hours').value)||0,
+    category: document.getElementById('nc_cat').value,
+    description: document.getElementById('nc_desc').value
+  };
+  if (!data.title || !data.date || !data.price || !data.capacity) { alert('請填寫必填欄位'); return; }
+  const r = await fetch('/api/training/courses', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data) });
+  const result = await r.json();
+  if (result.success) { alert('課程新增成功！'); loadCourses(); }
+}
+
+// CSV 匯出
+function exportTable(tableId) {
+  const table = document.getElementById(tableId);
+  if (!table) return;
+  const rows = Array.from(table.querySelectorAll('tr'));
+  const csv = rows.map(r => Array.from(r.querySelectorAll('th,td')).map(c => `"${c.innerText.replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(['\ufeff'+csv], { type:'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `${tableId}_${new Date().toISOString().slice(0,10)}.csv`;
+  link.click();
+}
+
+loadDashboard();
+</script>
+</body>
+</html>

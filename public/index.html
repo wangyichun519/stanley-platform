@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stanley 健康生活顧問 | 花蓮 × Coffee Priority × 漢方療癒</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+.hero-home {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: linear-gradient(135deg, var(--forest-deep) 0%, #3d6b3d 50%, var(--forest-mid) 100%);
+  position: relative;
+  overflow: hidden;
+}
+.hero-home::after {
+  content: '';
+  position: absolute;
+  right: -100px; top: -100px;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(122,173,110,0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-left {
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 80px 60px;
+  position: relative; z-index: 1;
+}
+.hero-eyebrow {
+  font-size: 12px; letter-spacing: 4px; color: var(--forest-light);
+  text-transform: uppercase; margin-bottom: 24px;
+}
+.hero-title {
+  font-size: clamp(36px, 5vw, 60px);
+  color: #fff; line-height: 1.2; margin-bottom: 24px;
+}
+.hero-title .accent { color: var(--forest-light); font-style: italic; }
+.hero-desc { color: rgba(255,255,255,0.8); font-size: 17px; line-height: 1.8; margin-bottom: 40px; max-width: 440px; }
+.hero-pills { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 40px; }
+.hero-pill {
+  background: rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.9);
+  padding: 8px 18px; border-radius: 20px; font-size: 13px;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+.hero-right {
+  display: flex; align-items: center; justify-content: center;
+  padding: 80px 40px;
+  position: relative; z-index: 1;
+}
+.services-grid-hero {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px; width: 100%; max-width: 420px;
+}
+.service-card-mini {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: var(--radius-lg);
+  padding: 24px 20px;
+  text-decoration: none;
+  transition: var(--transition);
+  color: #fff;
+}
+.service-card-mini:hover {
+  background: rgba(255,255,255,0.18);
+  transform: translateY(-4px);
+}
+.service-card-mini .icon { font-size: 32px; margin-bottom: 12px; display: block; }
+.service-card-mini .title { font-size: 14px; font-weight: 700; margin-bottom: 4px; font-family: 'Noto Serif TC'; }
+.service-card-mini .sub { font-size: 11px; opacity: 0.7; }
+
+/* Why Section */
+.why-section { background: var(--mist); }
+.why-card { text-align: center; }
+.why-icon { width: 72px; height: 72px; background: var(--forest-deep); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 20px; }
+.why-card h3 { color: var(--forest-deep); margin-bottom: 8px; font-size: 18px; }
+.why-card p { color: #666; font-size: 14px; }
+
+/* Stats Bar */
+.stats-bar { background: var(--forest-deep); padding: 48px 24px; }
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 32px; text-align: center; }
+.stat-num { font-size: 44px; font-weight: 700; color: var(--forest-light); font-family: 'Playfair Display'; }
+.stat-label { color: rgba(255,255,255,0.75); font-size: 14px; margin-top: 4px; }
+
+/* Brand Story */
+.brand-story { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+.story-text { }
+.story-text .tag { color: var(--earth); font-size: 13px; letter-spacing: 2px; margin-bottom: 16px; }
+.story-text h2 { font-size: 32px; color: var(--forest-deep); margin-bottom: 20px; line-height: 1.4; }
+.story-text p { color: #555; margin-bottom: 16px; }
+.story-certs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+.cert { background: var(--mist); border-left: 3px solid var(--forest-mid); padding: 8px 16px; border-radius: 0 8px 8px 0; font-size: 13px; color: var(--forest-deep); }
+.story-visual { background: linear-gradient(135deg, var(--forest-mid), var(--earth)); border-radius: var(--radius-lg); min-height: 360px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 80px; }
+
+/* CTA Section */
+.cta-section { background: linear-gradient(135deg, var(--earth), var(--bark)); padding: 80px 24px; text-align: center; }
+.cta-section h2 { color: #fff; font-size: 32px; margin-bottom: 16px; }
+.cta-section p { color: rgba(255,255,255,0.85); margin-bottom: 32px; font-size: 17px; }
+
+@media (max-width: 900px) {
+  .hero-home { grid-template-columns: 1fr; min-height: auto; }
+  .hero-right { display: none; }
+  .hero-left { padding: 60px 24px; }
+  .brand-story { grid-template-columns: 1fr; }
+  .story-visual { min-height: 200px; }
+}
+</style>
+</head>
+<body>
+<div id="navbar"></div>
+
+<!-- Hero -->
+<section class="hero-home">
+  <div class="hero-left">
+    <div class="hero-eyebrow">花蓮在地 × 醫護專業品牌</div>
+    <h1 class="hero-title">
+      照護，是一種<br>
+      有溫度的<br>
+      <span class="accent en">生活方式</span>
+    </h1>
+    <p class="hero-desc">
+      結合精神護理專業、SCA Q Grader 咖啡認證、家傳漢方資源，<br>
+      在花蓮打造全台唯一的療癒型長照服務品牌。
+    </p>
+    <div class="hero-pills">
+      <span class="hero-pill">🏥 長照3.0顧問</span>
+      <span class="hero-pill">☕ Coffee Priority</span>
+      <span class="hero-pill">🌿 漢方養生</span>
+      <span class="hero-pill">🏕️ 療癒露營</span>
+    </div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;">
+      <a href="/consulting.html" class="btn btn-primary">預約顧問諮詢</a>
+      <a href="/training.html" class="btn btn-white">瀏覽課程</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="services-grid-hero">
+      <a href="/consulting.html" class="service-card-mini fade-up fade-up-1">
+        <span class="icon">🏥</span>
+        <div class="title">醫管顧問</div>
+        <div class="sub">長照3.0 × SNQ × 評鑑</div>
+      </a>
+      <a href="/training.html" class="service-card-mini fade-up fade-up-2">
+        <span class="icon">📚</span>
+        <div class="title">教育訓練</div>
+        <div class="sub">失智 × 照服員 × 感控</div>
+      </a>
+      <a href="/coffee.html" class="service-card-mini fade-up fade-up-3">
+        <span class="icon">☕</span>
+        <div class="title">咖啡療癒</div>
+        <div class="sub">SCA認證 × 認知活化</div>
+      </a>
+      <a href="/shop.html" class="service-card-mini fade-up fade-up-3">
+        <span class="icon">🛍️</span>
+        <div class="title">選物商店</div>
+        <div class="sub">輔具 × 咖啡 × 漢方</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Stats -->
+<div class="stats-bar">
+  <div class="container">
+    <div class="stats-grid">
+      <div><div class="stat-num">97%</div><div class="stat-label">流感疫苗接種率</div></div>
+      <div><div class="stat-num">31,502</div><div class="stat-label">年度照護日數</div></div>
+      <div><div class="stat-num">Q</div><div class="stat-label">SCA Q Grader 認證</div></div>
+      <div><div class="stat-num">3.0</div><div class="stat-label">長照政策對接</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Why Section -->
+<section class="section why-section">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag">Why Choose Us</div>
+      <h2>為什麼選擇我們</h2>
+      <p>全台唯一結合精神護理、精品咖啡、漢方傳承的療癒型長照品牌</p>
+    </div>
+    <div class="grid-3">
+      <div class="card why-card fade-up fade-up-1">
+        <div class="why-icon">🏥</div>
+        <h3>臨床護理背景</h3>
+        <p>精神護理之家護理長，深諳長照法規與評鑑要求，提供最實務的顧問建議。</p>
+      </div>
+      <div class="card why-card fade-up fade-up-2">
+        <div class="why-icon">☕</div>
+        <h3>SCA Q Grader 認證</h3>
+        <p>國際精品咖啡認證，將咖啡療癒融入照護，開創台灣首見的咖啡認知活化課程。</p>
+      </div>
+      <div class="card why-card fade-up fade-up-3">
+        <div class="why-icon">🌿</div>
+        <h3>漢方傳承資源</h3>
+        <p>結合家傳中藥行資源，提供東西整合的養生照護方案，是我們獨有的差異化優勢。</p>
+      </div>
+      <div class="card why-card fade-up fade-up-1">
+        <div class="why-icon">🏕️</div>
+        <h3>花蓮在地優勢</h3>
+        <p>宜花東服務圈，長照3.0偏遠地區加乘補助，自然療癒環境是我們最強的護城河。</p>
+      </div>
+      <div class="card why-card fade-up fade-up-2">
+        <div class="why-icon">📋</div>
+        <h3>長照3.0專家</h3>
+        <p>2026年長照3.0正式上路，我們是機構接軌新制、申請智慧輔具補助的最佳夥伴。</p>
+      </div>
+      <div class="card why-card fade-up fade-up-3">
+        <div class="why-icon">🤝</div>
+        <h3>三代共融理念</h3>
+        <p>露營體驗連結三代情感，咖啡工坊促進代間互動，照護不只是服務，是生命的連結。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Brand Story -->
+<section class="section">
+  <div class="container">
+    <div class="brand-story">
+      <div class="story-text fade-up">
+        <div class="tag">OUR STORY</div>
+        <h2>從護理之家到<br>療癒生活品牌</h2>
+        <p>在花蓮的精神護理之家服務多年，深深感受到照護不只是醫療程序，更是生命的陪伴。我帶著護理長的專業，用一杯咖啡的溫度、漢方的智慧、以及東部的自然山水，重新定義照護的樣子。</p>
+        <p>Coffee Priority 不只是咖啡品牌，是我們相信「美好生活是最好的療癒」的具體實踐。</p>
+        <div class="story-certs">
+          <div class="cert">🎓 SCA Q Grader 國際認證</div>
+          <div class="cert">🏥 精神護理之家護理長</div>
+          <div class="cert">☕ 專業烘豆師</div>
+          <div class="cert">🌿 家傳中藥行資源</div>
+          <div class="cert">📋 長照3.0顧問</div>
+        </div>
+      </div>
+      <div class="story-visual">🌿</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2>準備好開始了嗎？</h2>
+  <p>無論是機構輔導、課程報名、還是一杯療癒的咖啡，我們都在這裡。</p>
+  <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+    <a href="/consulting.html" class="btn btn-white">預約顧問諮詢</a>
+    <a href="/shop.html" class="btn" style="background:rgba(255,255,255,0.2);color:#fff;border:2px solid rgba(255,255,255,0.4);">逛逛選物商店</a>
+  </div>
+</section>
+
+<div id="footer"></div>
+<script src="/js/components.js"></script>
+</body>
+</html>

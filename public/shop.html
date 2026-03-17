@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>選物商店 | Coffee Priority × 漢方 × 長照輔具</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+.product-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:20px; }
+.product-card { background:#fff; border-radius:var(--radius-lg); overflow:hidden; box-shadow:0 3px 16px var(--shadow); transition:var(--transition); }
+.product-card:hover { transform:translateY(-4px); box-shadow:0 8px 28px rgba(45,74,45,0.18); }
+.product-img { height:180px; display:flex; align-items:center; justify-content:center; font-size:60px; }
+.product-img.cat-coffee { background:linear-gradient(135deg,#f5edd5,#ead9b0); }
+.product-img.cat-tcm    { background:linear-gradient(135deg,#e8f5e8,#c8e6c8); }
+.product-img.cat-ltc    { background:linear-gradient(135deg,#e8f0ff,#c8d8f8); }
+.product-img.cat-camping{ background:linear-gradient(135deg,var(--mist),#c8dbc8); }
+.product-body { padding:16px; }
+.product-name { font-weight:700; color:var(--charcoal); margin-bottom:6px; font-size:15px; }
+.product-desc { color:#888; font-size:12px; line-height:1.5; margin-bottom:12px; }
+.product-footer { display:flex; justify-content:space-between; align-items:center; }
+.ltc-tag { font-size:11px; background:#e8f0ff; color:#3050b8; padding:2px 8px; border-radius:10px; margin-bottom:8px; display:inline-block; }
+
+/* Cart */
+.cart-btn {
+  position:fixed; bottom:24px; right:24px; z-index:100;
+  background:var(--forest-deep); color:#fff;
+  border:none; border-radius:50px; padding:14px 24px;
+  font-size:15px; cursor:pointer; box-shadow:0 6px 24px rgba(45,74,45,0.4);
+  display:flex; align-items:center; gap:10px; transition:var(--transition);
+}
+.cart-btn:hover { background:var(--forest-mid); }
+.cart-count { background:var(--earth); color:#fff; border-radius:50%; width:22px; height:22px; font-size:12px; display:flex; align-items:center; justify-content:center; font-weight:700; }
+.cart-drawer { position:fixed; right:0; top:0; bottom:0; width:380px; background:#fff; z-index:300; box-shadow:-8px 0 40px rgba(0,0,0,0.15); transform:translateX(100%); transition:var(--transition); display:flex; flex-direction:column; }
+.cart-drawer.open { transform:translateX(0); }
+.cart-header { background:var(--forest-deep); color:#fff; padding:20px 24px; display:flex; justify-content:space-between; align-items:center; }
+.cart-items { flex:1; overflow-y:auto; padding:16px; }
+.cart-item { display:flex; gap:12px; padding:12px 0; border-bottom:1px solid #f0f0f0; align-items:center; }
+.cart-item-emoji { font-size:28px; width:48px; text-align:center; }
+.cart-item-info { flex:1; }
+.cart-item-name { font-weight:600; font-size:14px; margin-bottom:2px; }
+.cart-item-price { color:var(--earth); font-size:14px; }
+.qty-ctrl { display:flex; align-items:center; gap:8px; }
+.qty-btn { width:28px; height:28px; border:1.5px solid #ddd; background:#fff; border-radius:6px; cursor:pointer; font-size:16px; transition:var(--transition); }
+.qty-btn:hover { border-color:var(--forest-mid); }
+.cart-footer { padding:20px 24px; border-top:2px solid var(--mist); }
+.cart-total { display:flex; justify-content:space-between; font-size:18px; font-weight:700; margin-bottom:16px; }
+
+/* Checkout Modal */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:400; align-items:center; justify-content:center; padding:16px; }
+.modal-overlay.active { display:flex; }
+.modal { background:#fff; border-radius:var(--radius-lg); padding:36px; max-width:480px; width:100%; max-height:90vh; overflow-y:auto; }
+</style>
+</head>
+<body>
+<div id="navbar"></div>
+
+<section class="hero" style="min-height:280px;background:linear-gradient(135deg,var(--bark) 0%,var(--earth) 50%,#b8960a 100%);">
+  <div class="container hero-content">
+    <div class="hero-tag">SELECT SHOP</div>
+    <h1>選物商店</h1>
+    <p>Coffee Priority 精品咖啡 × 家傳漢方養生 × 長照3.0智慧輔具 × 露營裝備</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <!-- 分類篩選 -->
+    <div class="filter-tabs" style="margin-bottom:28px;" id="catTabs">
+      <button class="filter-tab active" onclick="filterProducts('all',this)">全部商品</button>
+      <button class="filter-tab" onclick="filterProducts('coffee',this)">☕ Coffee Priority</button>
+      <button class="filter-tab" onclick="filterProducts('tcm',this)">🌿 漢方養生</button>
+      <button class="filter-tab" onclick="filterProducts('ltc',this)">🏥 長照輔具</button>
+      <button class="filter-tab" onclick="filterProducts('camping',this)">🏕️ 露營裝備</button>
+    </div>
+
+    <!-- 長照補助提醒 -->
+    <div class="card" style="background:#e8f0ff;border-left:4px solid #3050b8;box-shadow:none;margin-bottom:28px;display:flex;gap:16px;align-items:center;">
+      <span style="font-size:32px;">💡</span>
+      <div>
+        <strong style="color:#3050b8;">長照3.0智慧輔具補助</strong>
+        <p style="color:#555;font-size:13px;margin-top:4px;">標示 🏥 補助 的商品屬於長照3.0給付輔具，申請通過後可享政府補助。購買前建議先聯繫照顧管理專員確認資格。</p>
+      </div>
+    </div>
+
+    <div class="product-grid" id="productGrid">
+      <div style="grid-column:1/-1;text-align:center;padding:40px;color:#888;">載入商品中...</div>
+    </div>
+  </div>
+</section>
+
+<!-- 購物車 -->
+<button class="cart-btn" id="cartBtn" onclick="toggleCart()">
+  🛍️ 購物車 <span class="cart-count" id="cartCount">0</span>
+</button>
+
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-header">
+    <h3>🛍️ 購物車</h3>
+    <button onclick="toggleCart()" style="background:none;border:none;color:#fff;font-size:24px;cursor:pointer;">×</button>
+  </div>
+  <div class="cart-items" id="cartItems">
+    <p style="text-align:center;color:#888;padding:40px;">購物車是空的</p>
+  </div>
+  <div class="cart-footer">
+    <div class="cart-total">
+      <span>合計</span>
+      <span style="color:var(--earth);" id="cartTotal">NT$0</span>
+    </div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;" onclick="openCheckout()">結帳</button>
+  </div>
+</div>
+
+<!-- 結帳 Modal -->
+<div class="modal-overlay" id="checkoutModal">
+  <div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <h3>📦 結帳資訊</h3>
+      <button onclick="closeCheckout()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#999;">×</button>
+    </div>
+    <form id="checkoutForm">
+      <div class="form-group">
+        <label class="form-label">姓名<span class="required">*</span></label>
+        <input type="text" class="form-control" id="co_name" required>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div class="form-group">
+          <label class="form-label">電話<span class="required">*</span></label>
+          <input type="tel" class="form-control" id="co_phone" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email<span class="required">*</span></label>
+          <input type="email" class="form-control" id="co_email" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">配送方式</label>
+        <select class="form-control" id="co_shipping" onchange="toggleAddress()">
+          <option value="delivery">宅配到府</option>
+          <option value="pickup">門市取貨（花蓮）</option>
+        </select>
+      </div>
+      <div class="form-group" id="addressGroup">
+        <label class="form-label">收件地址</label>
+        <input type="text" class="form-control" id="co_address" placeholder="請填寫完整地址">
+      </div>
+      <div class="form-group">
+        <label class="form-label">備注</label>
+        <textarea class="form-control" id="co_note" rows="2" placeholder="特殊需求請說明"></textarea>
+      </div>
+      <div class="card" style="background:var(--mist);box-shadow:none;margin-bottom:20px;">
+        <div id="orderSummary"></div>
+        <div style="border-top:1px solid #ddd;margin-top:12px;padding-top:12px;font-weight:700;font-size:18px;display:flex;justify-content:space-between;">
+          <span>合計</span><span style="color:var(--earth);" id="checkoutTotal"></span>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;">
+        💳 前往 LINE Pay 付款
+      </button>
+    </form>
+  </div>
+</div>
+
+<div id="footer"></div>
+<script src="/js/components.js"></script>
+<script>
+let allProducts = [], cart = [], currentFilter = 'all';
+const catEmoji = { coffee:'☕', tcm:'🌿', ltc:'🏥', camping:'🏕️' };
+
+async function loadProducts() {
+  allProducts = await apiGet('/api/shop/products');
+  renderProducts(allProducts);
+}
+
+function renderProducts(products) {
+  const grid = document.getElementById('productGrid');
+  if (!products.length) { grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#888;">此分類暫無商品</div>'; return; }
+  grid.innerHTML = products.map(p => `
+    <div class="product-card">
+      <div class="product-img cat-${p.category}">${catEmoji[p.category]||'📦'}</div>
+      <div class="product-body">
+        ${p.ltc_subsidy ? '<span class="ltc-tag">🏥 長照3.0補助輔具</span>' : ''}
+        <div class="product-name">${p.name}</div>
+        <div class="product-desc">${p.description||''}</div>
+        <div class="product-footer">
+          <span class="price">NT$${p.price.toLocaleString()}</span>
+          <button class="btn btn-primary" style="padding:8px 16px;font-size:13px;" 
+            onclick="addToCart(${p.id})" ${p.stock<=0?'disabled':''}>
+            ${p.stock<=0 ? '缺貨' : '加入購物車'}
+          </button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function filterProducts(cat, btn) {
+  currentFilter = cat;
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  const filtered = cat === 'all' ? allProducts : allProducts.filter(p => p.category === cat);
+  renderProducts(filtered);
+}
+
+function addToCart(id) {
+  const p = allProducts.find(x => x.id === id);
+  const existing = cart.find(x => x.id === id);
+  if (existing) existing.qty++;
+  else cart.push({ id: p.id, name: p.name, price: p.price, qty: 1, emoji: catEmoji[p.category]||'📦' });
+  updateCart();
+  showToast('✅ 已加入購物車！', 'success');
+}
+
+function updateCart() {
+  const count = cart.reduce((s,i) => s + i.qty, 0);
+  const total = cart.reduce((s,i) => s + i.price * i.qty, 0);
+  document.getElementById('cartCount').textContent = count;
+  document.getElementById('cartTotal').textContent = `NT$${total.toLocaleString()}`;
+  
+  const items = document.getElementById('cartItems');
+  if (!cart.length) { items.innerHTML = '<p style="text-align:center;color:#888;padding:40px;">購物車是空的</p>'; return; }
+  items.innerHTML = cart.map((i,idx) => `
+    <div class="cart-item">
+      <div class="cart-item-emoji">${i.emoji}</div>
+      <div class="cart-item-info">
+        <div class="cart-item-name">${i.name}</div>
+        <div class="cart-item-price">NT$${(i.price*i.qty).toLocaleString()}</div>
+      </div>
+      <div class="qty-ctrl">
+        <button class="qty-btn" onclick="changeQty(${idx},-1)">−</button>
+        <span>${i.qty}</span>
+        <button class="qty-btn" onclick="changeQty(${idx},1)">+</button>
+      </div>
+    </div>`).join('');
+}
+
+function changeQty(idx, delta) {
+  cart[idx].qty += delta;
+  if (cart[idx].qty <= 0) cart.splice(idx, 1);
+  updateCart();
+}
+
+function toggleCart() { document.getElementById('cartDrawer').classList.toggle('open'); }
+function toggleAddress() {
+  const method = document.getElementById('co_shipping').value;
+  document.getElementById('addressGroup').style.display = method === 'delivery' ? 'block' : 'none';
+}
+
+function openCheckout() {
+  if (!cart.length) { showToast('購物車是空的', 'error'); return; }
+  const total = cart.reduce((s,i) => s + i.price * i.qty, 0);
+  document.getElementById('orderSummary').innerHTML = cart.map(i => 
+    `<div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:14px;"><span>${i.emoji} ${i.name} ×${i.qty}</span><span>NT$${(i.price*i.qty).toLocaleString()}</span></div>`
+  ).join('');
+  document.getElementById('checkoutTotal').textContent = `NT$${total.toLocaleString()}`;
+  toggleCart();
+  document.getElementById('checkoutModal').classList.add('active');
+}
+function closeCheckout() { document.getElementById('checkoutModal').classList.remove('active'); }
+
+document.getElementById('checkoutForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const total = cart.reduce((s,i) => s + i.price * i.qty, 0);
+  const orderData = {
+    customer_name: document.getElementById('co_name').value,
+    phone: document.getElementById('co_phone').value,
+    email: document.getElementById('co_email').value,
+    address: document.getElementById('co_address').value,
+    items: cart.map(i => ({ id: i.id, name: i.name, price: i.price, qty: i.qty })),
+    shipping_method: document.getElementById('co_shipping').value,
+    note: document.getElementById('co_note').value
+  };
+  const result = await apiPost('/api/shop/order', orderData);
+  if (result.success) {
+    const payResult = await apiPost('/api/linepay/request', {
+      amount: total,
+      orderId: result.order_no,
+      orderType: 'shop',
+      productName: `選物商店訂單 #${result.order_no}`
+    });
+    if (payResult.success) { window.location.href = payResult.paymentUrl; }
+    else showToast('金流建立失敗', 'error');
+  } else showToast('❌ ' + result.message, 'error');
+});
+
+// URL 參數自動篩選
+const urlCat = new URLSearchParams(location.search).get('cat');
+loadProducts().then(() => {
+  if (urlCat) {
+    const tabs = document.querySelectorAll('.filter-tab');
+    tabs.forEach(t => {
+      if (t.getAttribute('onclick')?.includes(`'${urlCat}'`)) t.click();
+    });
+  }
+});
+</script>
+</body>
+</html>

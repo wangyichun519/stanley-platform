@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>醫管顧問服務 | Stanley 健康生活顧問</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+.services-list { display: grid; gap: 16px; }
+.service-item {
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 24px;
+  border-left: 4px solid var(--forest-mid);
+  box-shadow: 0 2px 12px var(--shadow);
+  cursor: pointer; transition: var(--transition);
+}
+.service-item:hover, .service-item.selected {
+  border-color: var(--earth);
+  box-shadow: 0 4px 20px rgba(139,105,20,0.2);
+}
+.service-item .service-name { font-size: 17px; font-weight: 700; color: var(--forest-deep); margin-bottom: 6px; }
+.service-item .service-desc { color: #666; font-size: 14px; margin-bottom: 12px; }
+.service-item .service-footer { display: flex; justify-content: space-between; align-items: center; }
+.form-section { background: #fff; border-radius: var(--radius-lg); padding: 36px; box-shadow: 0 4px 20px var(--shadow); }
+.layout { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
+.sticky-form { position: sticky; top: 80px; }
+@media(max-width:900px){ .layout { grid-template-columns:1fr; } .sticky-form { position:static; } }
+.urgent-toggle { display: flex; align-items: center; gap: 12px; }
+.toggle { position: relative; width: 52px; height: 28px; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; inset: 0; background: #ccc; border-radius: 14px; cursor: pointer; transition: 0.3s; }
+.slider::before { content:''; position:absolute; height:20px; width:20px; left:4px; bottom:4px; background:#fff; border-radius:50%; transition:0.3s; }
+input:checked + .slider { background: var(--earth); }
+input:checked + .slider::before { transform: translateX(24px); }
+.steps { display: flex; gap: 0; margin-bottom: 32px; }
+.step { flex: 1; text-align: center; padding: 16px; position: relative; }
+.step::after { content:'→'; position:absolute; right:-8px; top:50%; transform:translateY(-50%); color:#ccc; }
+.step:last-child::after { display:none; }
+.step-num { width: 32px; height: 32px; background: var(--mist); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: var(--forest-deep); margin: 0 auto 6px; }
+.step.active .step-num { background: var(--forest-deep); color: #fff; }
+.step-label { font-size: 12px; color: #888; }
+</style>
+</head>
+<body>
+<div id="navbar"></div>
+
+<section class="hero" style="min-height:320px;">
+  <div class="container hero-content">
+    <div class="hero-tag">CONSULTING SERVICES</div>
+    <h1>醫管顧問服務</h1>
+    <p>長照3.0 × SNQ申請 × 評鑑輔導 × 智慧輔具導入<br>花蓮在地，宜花東服務圈</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+
+    <!-- 流程說明 -->
+    <div class="steps">
+      <div class="step active"><div class="step-num">1</div><div class="step-label">填寫需求</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-label">1-2天確認</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-label">LINE Pay訂金</div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-label">開始服務</div></div>
+    </div>
+
+    <div class="layout">
+      <!-- 左：服務項目 -->
+      <div>
+        <div class="section-header" style="text-align:left;margin-bottom:24px;">
+          <h2>服務項目</h2>
+          <p>點選服務項目，系統將自動帶入表單</p>
+        </div>
+        <div class="services-list" id="servicesList">
+          <!-- 動態載入 -->
+        </div>
+
+        <div class="card" style="margin-top:24px;background:var(--mist);box-shadow:none;">
+          <h4 style="color:var(--forest-deep);margin-bottom:12px;">🌿 為什麼選擇我們</h4>
+          <ul style="list-style:none;display:grid;gap:8px;">
+            <li>✅ 精神護理之家護理長親自顧問</li>
+            <li>✅ 長照3.0法規第一手解讀</li>
+            <li>✅ 花蓮在地，宜花東快速服務</li>
+            <li>✅ SNQ、評鑑、長照輔具一站搞定</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 右：預約表單 -->
+      <div class="sticky-form">
+        <div class="form-section">
+          <h3 style="color:var(--forest-deep);margin-bottom:24px;font-size:22px;">預約顧問諮詢</h3>
+          <form id="consultingForm">
+            <div class="form-group">
+              <label class="form-label">機構名稱 / 姓名<span class="required">*</span></label>
+              <input type="text" class="form-control" id="org_name" placeholder="例：花蓮縣OO護理之家" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">聯絡人姓名</label>
+              <input type="text" class="form-control" id="contact_name" placeholder="您的姓名">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+              <div class="form-group">
+                <label class="form-label">聯絡電話<span class="required">*</span></label>
+                <input type="tel" class="form-control" id="phone" placeholder="0912-345-678" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email<span class="required">*</span></label>
+                <input type="email" class="form-control" id="email" placeholder="your@email.com" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">服務類型<span class="required">*</span></label>
+              <select class="form-control" id="service_type" required>
+                <option value="">請選擇服務項目</option>
+                <option value="SNQ國家品質標章申請輔導">SNQ國家品質標章申請輔導</option>
+                <option value="評鑑輔導（精神護理之家）">評鑑輔導（精神護理之家）</option>
+                <option value="醫照整合顧問（長照3.0）">醫照整合顧問（長照3.0）</option>
+                <option value="智慧輔具導入規劃">智慧輔具導入規劃</option>
+                <option value="護理長培訓課程設計">護理長培訓課程設計</option>
+                <option value="法規諮詢（單次）">法規諮詢（單次）</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">需求描述</label>
+              <textarea class="form-control" id="description" placeholder="請簡述您的需求，讓我們提前了解您的狀況..."></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">偏好聯絡時段</label>
+              <select class="form-control" id="preferred_time">
+                <option value="早上（09:00-12:00）">早上（09:00-12:00）</option>
+                <option value="下午（13:00-17:00）">下午（13:00-17:00）</option>
+                <option value="晚上（19:00-21:00）">晚上（19:00-21:00）</option>
+                <option value="均可">均可</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">緊急案件（加價20%）</label>
+              <div class="urgent-toggle">
+                <label class="toggle">
+                  <input type="checkbox" id="urgent">
+                  <span class="slider"></span>
+                </label>
+                <span style="font-size:13px;color:#888;">3個工作天內需完成</span>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:16px;" id="submitBtn">
+              📋 送出預約申請
+            </button>
+            <p style="text-align:center;font-size:12px;color:#888;margin-top:12px;">
+              送出後我們將在1-2個工作天內與您聯繫確認細節
+            </p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="footer"></div>
+<script src="/js/components.js"></script>
+<script>
+// 動態載入服務列表
+async function loadServices() {
+  const data = await apiGet('/api/consulting/services');
+  const list = document.getElementById('servicesList');
+  list.innerHTML = data.map(s => `
+    <div class="service-item" onclick="selectService('${s.name}', this)">
+      <div class="service-name">${s.name}</div>
+      <div class="service-footer">
+        <span class="badge badge-green">${s.unit}計費</span>
+        <span class="price" style="font-size:18px;">NT$${s.price.toLocaleString()} <span class="price-unit">起</span></span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function selectService(name, el) {
+  document.querySelectorAll('.service-item').forEach(i => i.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('service_type').value = name;
+}
+
+// 表單送出
+document.getElementById('consultingForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('submitBtn');
+  btn.textContent = '送出中...'; btn.disabled = true;
+
+  const data = {
+    org_name: document.getElementById('org_name').value,
+    contact_name: document.getElementById('contact_name').value,
+    phone: document.getElementById('phone').value,
+    email: document.getElementById('email').value,
+    service_type: document.getElementById('service_type').value,
+    description: document.getElementById('description').value,
+    preferred_time: document.getElementById('preferred_time').value,
+    urgent: document.getElementById('urgent').checked
+  };
+
+  const result = await apiPost('/api/consulting/request', data);
+  
+  if (result.success) {
+    showToast('✅ 預約申請已送出！確認信已寄送至您的信箱。', 'success');
+    document.getElementById('consultingForm').reset();
+  } else {
+    showToast('❌ ' + result.message, 'error');
+  }
+  
+  btn.textContent = '📋 送出預約申請'; btn.disabled = false;
+});
+
+loadServices();
+</script>
+</body>
+</html>
