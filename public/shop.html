@@ -186,6 +186,21 @@
 <script>
 let allProducts = [], currentFilter = 'all';
 const catEmoji = { coffee:'☕', tcm:'🌿', ltc:'🏥', camping:'🏕️' };
+// 特定商品專屬 emoji
+const productEmoji = {
+  '阿里山他扶芽有機咖啡豆': '🌿',
+  '哥倫比亞天堂莊園玫瑰茶咖啡': '🌹',
+  '青檸香頌冷萃特調包': '🍋',
+  '銀髮養生茶禮盒': '🫖',
+  '漢方沐浴包 - 舒活配方': '🛁',
+  '智慧離床感應器': '📡',
+  'GPS走失防護定位器': '📍',
+  '三代同堂露營輕量椅': '🪑',
+  '長者友善手沖咖啡組': '🫗',
+  '花蓮精品咖啡豆 - 秀姑巒莊園': '⛰️',
+  '花蓮精品咖啡豆 - 吉安日曬': '☀️'
+};
+function getProductEmoji(p) { return productEmoji[p.name] || catEmoji[p.category] || '📦'; }
 
 // 購物車 localStorage 持久化
 function loadCart() {
@@ -206,7 +221,7 @@ function renderProducts(products) {
   if (!products.length) { grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#888;">此分類暫無商品</div>'; return; }
   grid.innerHTML = products.map(p => `
     <div class="product-card">
-      <div class="product-img cat-${p.category}">${catEmoji[p.category]||'📦'}</div>
+      <div class="product-img cat-${p.category}">${getProductEmoji(p)}</div>
       <div class="product-body">
         ${p.ltc_subsidy ? '<span class="ltc-tag">🏥 長照3.0補助輔具</span>' : ''}
         <div class="product-name">${p.name}</div>
@@ -234,7 +249,7 @@ function addToCart(id) {
   const p = allProducts.find(x => x.id === id);
   const existing = cart.find(x => x.id === id);
   if (existing) existing.qty++;
-  else cart.push({ id: p.id, name: p.name, price: p.price, qty: 1, emoji: catEmoji[p.category]||'📦' });
+  else cart.push({ id: p.id, name: p.name, price: p.price, qty: 1, emoji: getProductEmoji(p) });
   saveCart(cart);
   updateCart();
   showToast('✅ 已加入購物車！', 'success');
