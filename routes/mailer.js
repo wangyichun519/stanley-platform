@@ -1,25 +1,27 @@
-// routes/mailer.js - Email 通知服務（Nodemailer + Gmail port 587）
-const nodemailer = require('nodemailer');
-
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
-  secure: false,
-  requireTLS: true,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: (process.env.EMAIL_PASS || '').replace(/\s/g, '') // 移除應用程式密碼中的空格
-  },
-  tls: { rejectUnauthorized: false },
-  connectionTimeout: 15000,
-  socketTimeout: 15000
-});
-
+// routes/mailer.js - Email 通知服務（Resend HTTP API）
 const BRAND = 'Stanley 健康生活顧問';
-const LOGO_COLOR = '#2D4A2D';
+const FROM = 'Stanley 健康生活顧問 <onboarding@resend.dev>';
+
+// 共用發信函式
+async function sendMail({ to, subject, html }) {
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ from: FROM, to: [to], subject, html })
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Resend API 錯誤: ${err}`);
+  }
+  return res.json();
+}
 
 // 共用 Email 樣板框架
 function emailWrapper(content) {
+  const LOGO_COLOR = '#2D4A2D';
   return `
 <!DOCTYPE html>
 <html>
@@ -43,7 +45,7 @@ function emailWrapper(content) {
   <div class="body">${content}</div>
   <div class="footer">
     <p>花蓮 × Coffee Priority × 傳統漢方</p>
-    <p>如有疑問請聯絡：${process.env.EMAIL_USER}</p>
+    <p>如有疑問請聯絡：${process.env.EMAIL_USER || 'stanley@stanleyhealthcare.tw'}</p>
   </div>
 </div>
 </body></html>`;
@@ -64,8 +66,7 @@ async function sendConsultingConfirm(to, data) {
     </div>
     <p>Stanley 護理長將親自與您聯繫，提供最專業的醫管顧問服務。</p>
   `;
-  await transporter.sendMail({
-    from: `"${BRAND}" <${process.env.EMAIL_USER}>`,
+  await sendMail({
     to,
     subject: `【${BRAND}】顧問預約確認 - ${data.service_type}`,
     html: emailWrapper(content)
@@ -86,10 +87,8 @@ async function sendCourseConfirm(to, data, course) {
       <p>費用：NT$${course.price}（已付款）</p>
     </div>
     <p>⚠️ 注意事項：請準時報到，上課前請保持電話暢通。</p>
-    <p>開課前3天我們會再發送提醒通知給您。</p>
   `;
-  await transporter.sendMail({
-    from: `"${BRAND}" <${process.env.EMAIL_USER}>`,
+  await sendMail({
     to,
     subject: `【${BRAND}】課程報名成功 - ${course.title}`,
     html: emailWrapper(content)
@@ -109,8 +108,7 @@ async function sendCourseReminder(to, name, course) {
     </div>
     <p>期待與您相見！如有任何問題請提前告知。</p>
   `;
-  await transporter.sendMail({
-    from: `"${BRAND}" <${process.env.EMAIL_USER}>`,
+  await sendMail({
     to,
     subject: `【提醒】${course.title} 即將在3天後開始`,
     html: emailWrapper(content)
@@ -133,8 +131,7 @@ async function sendOrderConfirm(to, order) {
     </div>
     <p>出貨後我們會再通知您，感謝您支持花蓮在地品牌！</p>
   `;
-  await transporter.sendMail({
-    from: `"${BRAND}" <${process.env.EMAIL_USER}>`,
+  await sendMail({
     to,
     subject: `【${BRAND}】訂單確認 #${order.order_no}`,
     html: emailWrapper(content)
