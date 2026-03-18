@@ -52,6 +52,62 @@ app.get('/api/admin/dashboard', basicAuth({
   res.json(stats);
 });
 
+// ─── AI 咖啡顧問（NVIDIA NIM）─────────────────────────
+app.post('/api/coffee-ai', async (req, res) => {
+  try {
+    const { message, history = [] } = req.body;
+    if (!message) return res.status(400).json({ error: '請輸入訊息' });
+
+    const systemPrompt = `你是「Coffee Priority 咖啡療癒工作坊」的 AI 咖啡顧問，由 Stanley 老師（SCA Q Grader 認證）授權。
+你的任務是根據訪客的口味偏好、健康狀況或需求，推薦最適合的課程或咖啡豆。
+
+【我們的服務】
+1. 銀髮咖啡師初級班 - NT$3,800 / 6週課程（每週六 09:00-11:00），適合銀髮族、長輩，融入認知活化訓練，本期剩4名額
+2. 機構咖啡角規劃顧問 - NT$15,000起，適合護理之家、長照機構，包含空間規劃＋培訓＋3個月追蹤
+3. 花蓮精品咖啡豆 - 宜花東在地莊園豆，SCA Q Grader 親自杯測，自家烘焙，限量供應
+
+【口味推薦指南】
+- 喜歡清爽、果香、酸感 → 推薦淺焙花蓮富里高山豆
+- 喜歡平衡、甜感、堅果香 → 推薦中焙壽豐莊園豆
+- 喜歡濃郁、可可、醇厚 → 推薦深焙日曬豆
+
+請用親切、簡短的繁體中文回覆（150字內），針對訪客問題直接給建議，並自然引導他們行動（報名/購買/LINE諮詢）。`;
+
+    const messages = [
+      { role: 'system', content: systemPrompt },
+      ...history.slice(-6),
+      { role: 'user', content: message }
+    ];
+
+    const response = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.NVIDIA_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'meta/llama-3.1-8b-instruct',
+        messages,
+        temperature: 0.7,
+        max_tokens: 300
+      })
+    });
+
+    if (!response.ok) {
+      const err = await response.text();
+      console.error('NVIDIA API error:', err);
+      return res.status(500).json({ error: 'AI 服務暫時無法使用' });
+    }
+
+    const data = await response.json();
+    const reply = data.choices?.[0]?.message?.content || '抱歉，請稍後再試。';
+    res.json({ reply });
+  } catch (e) {
+    console.error('coffee-ai error:', e);
+    res.status(500).json({ error: 'AI 服務暫時無法使用' });
+  }
+});
+
 // ─── 健康檢查 ─────────────────────────────────────────
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString() });
