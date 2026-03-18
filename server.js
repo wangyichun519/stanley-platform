@@ -165,28 +165,30 @@ const RSS_SOURCES = [
   { key: 'world_cafe', label: '🌹 世界咖啡',   flag: 'WD', url: 'https://news.google.com/rss/search?q=specialty+coffee+health+research&hl=en-US&gl=US&ceid=US:en' },
   { key: 'world_well', label: '💊 全球健康',   flag: 'WD', url: 'https://news.google.com/rss/search?q=WHO+global+health+2025&hl=en-US&gl=US&ceid=US:en' },
 ];
-let _newsCache = { ts: 0, data: null };
+// 按需快取：每個頻道獨立快取，不一次抓全部
+const _newsCacheMap = {};
 
 app.get('/api/news', async (req, res) => {
-  const now = Date.now();
-  if (_newsCache.data && (now - _newsCache.ts) < 30 * 60 * 1000) {
-    return res.json(_newsCache.data);
+  const key = req.query.key || 'tw_ltc';
+  const src = RSS_SOURCES.find(s => s.key === key);
+  if (!src) return res.json({ label: '未知', flag: 'TW', items: [] });
+
+  const cached = _newsCacheMap[key];
+  if (cached && (Date.now() - cached.ts) < 30 * 60 * 1000) {
+    return res.json(cached.data);
   }
-  const results = {};
-  await Promise.allSettled(RSS_SOURCES.map(async src => {
-    try {
-      const r = await fetch(src.url, {
-        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; StanleyHealthBot/1.0)' },
-        signal: AbortSignal.timeout(8000)
-      });
-      const xml = await r.text();
-      results[src.key] = { label: src.label, flag: src.flag, items: parseRSSItems(xml, 4) };
-    } catch {
-      results[src.key] = { label: src.label, flag: src.flag, items: [] };
-    }
-  }));
-  _newsCache = { ts: now, data: results };
-  res.json(results);
+  try {
+    const r = await fetch(src.url, {
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; StanleyHealthBot/1.0)' },
+      signal: AbortSignal.timeout(8000)
+    });
+    const xml = await r.text();
+    const data = { label: src.label, flag: src.flag, items: parseRSSItems(xml, 5) };
+    _newsCacheMap[key] = { ts: Date.now(), data };
+    res.json(data);
+  } catch {
+    res.json({ label: src.label, flag: src.flag, items: [] });
+  }
 });
 
 // ─── 每日長照新知（日期快取，每天只呼叫 NVIDIA 一次）──────

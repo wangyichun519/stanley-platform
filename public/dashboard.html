@@ -132,17 +132,7 @@ body { background: #0d1117; }
 .news-title a:hover { color: var(--forest-light); }
 .news-meta { font-size: 11px; color: rgba(255,255,255,0.3); }
 .news-loading { text-align: center; padding: 32px; color: rgba(255,255,255,0.3); font-size: 13px; }
-.news-ticker {
-  background: rgba(0,0,0,0.3); border-top: 1px solid rgba(255,255,255,0.07);
-  padding: 10px 24px; display: flex; align-items: center; gap: 16px; overflow: hidden;
-}
-.news-ticker-label { font-size: 11px; font-weight: 700; color: #f59e0b; white-space: nowrap; flex-shrink: 0; }
-.ticker-track { overflow: hidden; flex: 1; }
-.ticker-inner { display: flex; gap: 40px; animation: ticker 30s linear infinite; white-space: nowrap; }
-@keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-.ticker-inner:hover { animation-play-state: paused; }
-.ticker-item { font-size: 12px; color: rgba(255,255,255,0.6); white-space: nowrap; }
-.ticker-item::before { content: '▸ '; color: var(--forest-light); }
+/* 跑馬燈已移除（節省記憶體） */
 
 /* ── 咖啡知識輪播 ── */
 .coffee-fact { font-size: 14px; color: rgba(255,255,255,0.75); line-height: 1.8; font-style: italic; padding: 16px; background: rgba(245,158,11,0.07); border-left: 3px solid #f59e0b; border-radius: 0 8px 8px 0; margin-bottom: 14px; }
@@ -272,7 +262,7 @@ body { background: #0d1117; }
       <div id="newsFeed"><div class="news-loading">⏳ 正在抓取最新新聞...</div></div>
 
       <div style="margin-top:12px;text-align:right;">
-        <button class="tip-refresh" onclick="loadNews(true)">🔄 重新抓取</button>
+        <button class="tip-refresh" onclick="fetchNewsTab(currentNewsKey,true)">🔄 重新抓取</button>
         <span style="font-size:11px;color:rgba(255,255,255,0.2);margin-left:8px;" id="newsTime"></span>
       </div>
     </div>
@@ -406,14 +396,6 @@ body { background: #0d1117; }
 </div>
 </div>
 
-<!-- 新聞跑馬燈 -->
-<div class="news-ticker" id="tickerBar" style="display:none;">
-  <div class="news-ticker-label">🔴 LIVE</div>
-  <div class="ticker-track">
-    <div class="ticker-inner" id="tickerInner"></div>
-  </div>
-</div>
-
 <div class="db-footer">
   <p>© 2026 Stanley 健康生活顧問 | 花蓮 × 宜花東 | 每日 AI 自動更新</p>
 </div>
@@ -431,78 +413,73 @@ const now = new Date();
 document.getElementById('todayDate').textContent =
   `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 (${['日','一','二','三','四','五','六'][now.getDay()]})`;
 
-// ── 新聞 Feed ──
-let allNews = {};
+// ── 新聞 Feed（按需載入，點 tab 才 fetch 該頻道）──
+const _newsTabCache = {}; // 記憶體內快取，避免重複 fetch
 let currentNewsKey = 'tw_ltc';
 
-async function loadNews(force = false) {
-  const cacheKey = 'stanley_news_' + Math.floor(Date.now() / (30*60*1000));
-  if (!force) {
-    const cached = sessionStorage.getItem(cacheKey);
-    if (cached) {
-      try { allNews = JSON.parse(cached); renderNews(currentNewsKey); setupTicker(); return; } catch {}
-    }
+async function fetchNewsTab(key, force = false) {
+  if (!force && _newsTabCache[key]) {
+    renderNews(key, _newsTabCache[key]);
+    return;
   }
-  document.getElementById('newsFeed').innerHTML = '<div class="news-loading">⏳ 正在連線抓取最新新聞（台灣 + 世界）...</div>';
+  document.getElementById('newsFeed').innerHTML = '<div class="news-loading">⏳ 抓取中...</div>';
   try {
-    const res = await fetch('/api/news');
-    allNews = await res.json();
-    sessionStorage.setItem(cacheKey, JSON.stringify(allNews));
+    const res = await fetch(`/api/news?key=${encodeURIComponent(key)}`);
+    const data = await res.json();
+    _newsTabCache[key] = data;
     document.getElementById('newsTime').textContent = '剛剛更新';
-    renderNews(currentNewsKey);
-    setupTicker();
+    renderNews(key, data);
   } catch {
-    document.getElementById('newsFeed').innerHTML = '<div class="news-loading">⚠️ 新聞抓取失敗，請稍後重試</div>';
+    document.getElementById('newsFeed').innerHTML = '<div class="news-loading">⚠️ 抓取失敗，請稍後重試</div>';
   }
 }
 
-function renderNews(key) {
+function renderNews(key, section) {
   currentNewsKey = key;
-  const section = allNews[key];
   const feed = document.getElementById('newsFeed');
-  if (!section || !section.items?.length) {
+  if (!section?.items?.length) {
     feed.innerHTML = '<div class="news-loading" style="padding:20px;">⚠️ 此分類暫無新聞，請稍後重試</div>';
     return;
   }
   const isWorld = section.flag === 'WD';
-  feed.innerHTML = section.items.map(item => `
-    <div class="news-item">
-      <div class="news-dot ${isWorld ? 'news-dot-wd' : 'news-dot-tw'}"></div>
-      <div style="flex:1;">
-        <div class="news-title">
-          <a href="${item.link}" target="_blank" rel="noopener noreferrer">${item.title}</a>
-        </div>
-        <div class="news-meta">${section.label} · ${item.relTime || '最新'}</div>
-      </div>
-    </div>`).join('');
+  // 用 DocumentFragment 避免多次 reflow
+  const frag = document.createDocumentFragment();
+  section.items.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'news-item';
+    const dot = document.createElement('div');
+    dot.className = `news-dot ${isWorld ? 'news-dot-wd' : 'news-dot-tw'}`;
+    const info = document.createElement('div');
+    info.style.flex = '1';
+    const titleDiv = document.createElement('div');
+    titleDiv.className = 'news-title';
+    const a = document.createElement('a');
+    a.href = item.link || '#';
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.textContent = item.title; // textContent 防 XSS
+    titleDiv.appendChild(a);
+    const meta = document.createElement('div');
+    meta.className = 'news-meta';
+    meta.textContent = `${section.label} · ${item.relTime || '最新'}`;
+    info.appendChild(titleDiv);
+    info.appendChild(meta);
+    div.appendChild(dot);
+    div.appendChild(info);
+    frag.appendChild(div);
+  });
+  feed.innerHTML = '';
+  feed.appendChild(frag);
 }
 
 function switchNews(btn) {
   document.querySelectorAll('.news-tab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
-  const key = btn.dataset.key;
-  if (allNews[key]) {
-    renderNews(key);
-  } else {
-    document.getElementById('newsFeed').innerHTML = '<div class="news-loading">⏳ 載入中...</div>';
-  }
+  fetchNewsTab(btn.dataset.key);
 }
 
-function setupTicker() {
-  // 從所有頻道蒐集標題做跑馬燈
-  const allTitles = [];
-  Object.values(allNews).forEach(sec => {
-    (sec.items || []).slice(0,2).forEach(item => allTitles.push(item.title.slice(0,40)));
-  });
-  if (!allTitles.length) return;
-  const ticker = document.getElementById('tickerInner');
-  // 重複兩次讓滾動無縫
-  const doubled = [...allTitles, ...allTitles];
-  ticker.innerHTML = doubled.map(t => `<span class="ticker-item">${t}</span>`).join('');
-  document.getElementById('tickerBar').style.display = 'flex';
-}
-
-loadNews();
+// 只載入預設 tab（不一次抓全部）
+fetchNewsTab('tw_ltc');
 
 // ── 每日新知 ──
 async function loadDailyTip(force = false) {

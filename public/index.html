@@ -434,7 +434,7 @@
           <div style="background:rgba(122,173,110,0.08);border-radius:10px;padding:16px;border:1px solid rgba(122,173,110,0.15);">
             <div style="font-size:24px;margin-bottom:6px;">📰</div>
             <div style="font-size:12px;color:rgba(255,255,255,0.5);">今日主題</div>
-            <div style="font-size:13px;color:#fff;margin-top:4px;" id="homeTipPreview">AI 整理中...</div>
+            <div style="font-size:13px;color:#fff;margin-top:4px;">每日 AI 長照新知</div>
           </div>
           <div style="background:rgba(251,191,36,0.08);border-radius:10px;padding:16px;border:1px solid rgba(251,191,36,0.15);">
             <div style="font-size:24px;margin-bottom:6px;">☕</div>
@@ -491,12 +491,6 @@
 <div id="footer"></div>
 <script src="/js/components.js"></script>
 <script>
-// 首頁情報站預覽：載入今日新知標題
-fetch('/api/daily-tip').then(r=>r.json()).then(d=>{
-  const el = document.getElementById('homeTipPreview');
-  if (el && d.headline) el.textContent = d.headline.slice(0,20) + '…';
-}).catch(()=>{});
-
 // 設定 LINE 連結
 const lineUrl = `https://line.me/R/ti/p/${LINE_OFFICIAL_ID}`;
 const lineBtn = document.getElementById('lineHeroBtn');
