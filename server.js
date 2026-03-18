@@ -108,6 +108,22 @@ app.post('/api/coffee-ai', async (req, res) => {
   }
 });
 
+// ─── 測試信件 ─────────────────────────────────────────
+app.get('/api/test-email', async (req, res) => {
+  const { sendConsultingConfirm } = require('./routes/mailer');
+  try {
+    await sendConsultingConfirm(process.env.EMAIL_USER, {
+      org_name: '測試機構',
+      contact_name: 'Stanley',
+      service_type: '測試服務',
+      preferred_time: '上午'
+    });
+    res.json({ success: true, message: `信件已寄出至 ${process.env.EMAIL_USER}` });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // ─── 健康檢查 ─────────────────────────────────────────
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString() });
