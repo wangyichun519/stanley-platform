@@ -10,7 +10,9 @@
   min-height: 100vh;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  background: linear-gradient(135deg, var(--forest-deep) 0%, #3d6b3d 50%, var(--forest-mid) 100%);
+  background:
+    linear-gradient(135deg, rgba(30,58,30,0.88) 0%, rgba(45,85,45,0.82) 50%, rgba(60,105,60,0.78) 100%),
+    url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=80&fit=crop') center/cover no-repeat;
   position: relative;
   overflow: hidden;
 }
@@ -91,7 +93,9 @@
 .story-text p { color: #555; margin-bottom: 16px; }
 .story-certs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
 .cert { background: var(--mist); border-left: 3px solid var(--forest-mid); padding: 8px 16px; border-radius: 0 8px 8px 0; font-size: 13px; color: var(--forest-deep); }
-.story-visual { background: linear-gradient(135deg, var(--forest-mid), var(--earth)); border-radius: var(--radius-lg); min-height: 360px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 80px; }
+.story-visual { border-radius: var(--radius-lg); min-height: 360px; overflow: hidden; position: relative; }
+.story-visual img { width: 100%; height: 100%; object-fit: cover; border-radius: var(--radius-lg); display: block; transition: transform 0.6s ease; }
+.story-visual:hover img { transform: scale(1.03); }
 
 /* CTA Section */
 .cta-section { background: linear-gradient(135deg, var(--earth), var(--bark)); padding: 80px 24px; text-align: center; }
@@ -263,7 +267,10 @@
           <div class="cert">📋 長照3.0顧問</div>
         </div>
       </div>
-      <div class="story-visual">🌿</div>
+      <div class="story-visual">
+        <img src="https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=600&h=450&fit=crop&q=85"
+             alt="Stanley 護理長 – 花蓮健康生活顧問" loading="lazy">
+      </div>
     </div>
   </div>
 </section>
@@ -279,7 +286,12 @@
     <div class="grid-3" style="margin-bottom:32px;">
       <div class="new-product-card" style="position:relative;">
         <div class="new-badge">🆕 新品</div>
-        <div style="background:linear-gradient(135deg,#f0e8d0,#d4c090);height:160px;display:flex;align-items:center;justify-content:center;font-size:64px;">☕</div>
+        <div style="height:200px;overflow:hidden;">
+          <img src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=480&h=200&fit=crop&q=85"
+               alt="阿里山有機咖啡豆" loading="lazy"
+               style="width:100%;height:100%;object-fit:cover;transition:transform 0.4s;"
+               onmouseover="this.style.transform='scale(1.07)'" onmouseout="this.style.transform='scale(1)'">
+        </div>
         <div style="padding:20px;flex:1;display:flex;flex-direction:column;">
           <div style="font-size:11px;color:var(--earth);font-weight:700;letter-spacing:1px;margin-bottom:6px;">TAIWAN × ORGANIC</div>
           <h3 style="font-size:16px;color:var(--forest-deep);margin-bottom:8px;">阿里山他扶芽有機咖啡豆</h3>
@@ -292,7 +304,12 @@
       </div>
       <div class="new-product-card" style="position:relative;">
         <div class="new-badge">🌹 限量進口</div>
-        <div style="background:linear-gradient(135deg,#ffe8f0,#f8c8d8);height:160px;display:flex;align-items:center;justify-content:center;font-size:64px;">🌹</div>
+        <div style="height:200px;overflow:hidden;">
+          <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=480&h=200&fit=crop&q=85"
+               alt="天堂莊園玫瑰茶咖啡" loading="lazy"
+               style="width:100%;height:100%;object-fit:cover;transition:transform 0.4s;"
+               onmouseover="this.style.transform='scale(1.07)'" onmouseout="this.style.transform='scale(1)'">
+        </div>
         <div style="padding:20px;flex:1;display:flex;flex-direction:column;">
           <div style="font-size:11px;color:#d05080;font-weight:700;letter-spacing:1px;margin-bottom:6px;">COLOMBIA × FINCA EL PARAÍSO</div>
           <h3 style="font-size:16px;color:var(--forest-deep);margin-bottom:8px;">天堂莊園玫瑰茶咖啡</h3>
@@ -305,7 +322,12 @@
       </div>
       <div class="new-product-card" style="position:relative;">
         <div class="new-badge">🍋 夏季限定</div>
-        <div style="background:linear-gradient(135deg,#f0f8d0,#c8e870);height:160px;display:flex;align-items:center;justify-content:center;font-size:64px;">🍋</div>
+        <div style="height:200px;overflow:hidden;">
+          <img src="https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=480&h=200&fit=crop&q=85"
+               alt="青檸香頌冷萃特調包" loading="lazy"
+               style="width:100%;height:100%;object-fit:cover;transition:transform 0.4s;"
+               onmouseover="this.style.transform='scale(1.07)'" onmouseout="this.style.transform='scale(1)'">
+        </div>
         <div style="padding:20px;flex:1;display:flex;flex-direction:column;">
           <div style="font-size:11px;color:#7a9a00;font-weight:700;letter-spacing:1px;margin-bottom:6px;">HUALIEN × COLD BREW</div>
           <h3 style="font-size:16px;color:var(--forest-deep);margin-bottom:8px;">青檸香頌冷萃特調包</h3>
