@@ -87,6 +87,13 @@ router.get('/confirm', async (req, res) => {
   else if (type === 'camping') tableName = 'camping_registrations';
   else if (type === 'shop') tableName = 'orders';
 
+  // 白名單驗證，防止 SQL Injection
+  const allowedTypes = { consulting: 'consulting_requests', training: 'registrations', camping: 'camping_registrations', shop: 'orders' };
+  if (!allowedTypes[type]) {
+    return res.redirect(`${process.env.BASE_URL}/payment-fail.html`);
+  }
+  tableName = allowedTypes[type];
+
   try {
     const record = db.prepare(`SELECT * FROM ${tableName} WHERE payment_id = ?`).get(orderId);
     if (!record) throw new Error('找不到訂單');

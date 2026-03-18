@@ -2,23 +2,45 @@
 require('dotenv').config();
 const express = require('express');
 const basicAuth = require('express-basic-auth');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// ─── 安全 Headers（Helmet）────────────────────────────
+app.use(helmet({
+  contentSecurityPolicy: false // 允許 inline script（前端需要）
+}));
+
+// ─── 速率限制（Rate Limiting）─────────────────────────
+const generalLimit = rateLimit({ windowMs: 15 * 60 * 1000, max: 200, message: '請求過於頻繁，請稍後再試' });
+const apiLimit = rateLimit({ windowMs: 15 * 60 * 1000, max: 60, message: '請求過於頻繁，請稍後再試' });
+const aiLimit = rateLimit({ windowMs: 60 * 1000, max: 10, message: 'AI 使用次數過多，請稍後再試' });
+
+app.use(generalLimit);
+app.use('/api/', apiLimit);
+app.use('/api/coffee-ai', aiLimit);
+
 // ─── Middleware ──────────────────────────────────────
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ─── 後台保護（HTTP Basic Auth）────────────────────
-app.use('/admin', basicAuth({
+const adminAuth = basicAuth({
   users: { [process.env.ADMIN_USER || 'stanley']: process.env.ADMIN_PASS || 'admin123' },
   challenge: true,
   realm: 'Stanley Healthcare Admin'
-}));
+});
+app.use('/admin', adminAuth);
 app.use('/admin', express.static(path.join(__dirname, 'admin')));
+
+// ─── 後台 API 認證 middleware ─────────────────────────
+const requireAdmin = (req, res, next) => {
+  adminAuth(req, res, next);
+};
 
 // ─── API 路由 ─────────────────────────────────────────
 app.use('/api/consulting', require('./routes/consulting'));

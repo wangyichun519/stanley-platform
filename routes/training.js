@@ -1,8 +1,14 @@
 // routes/training.js - 教育訓練報名 API
 const express = require('express');
 const router = express.Router();
+const basicAuth = require('express-basic-auth');
 const { getDb } = require('../db/database');
 const { sendCourseConfirm } = require('./mailer');
+
+const adminAuth = basicAuth({
+  users: { [process.env.ADMIN_USER || 'stanley']: process.env.ADMIN_PASS || 'admin123' },
+  challenge: true
+});
 
 // 取得所有開放課程
 router.get('/courses', (req, res) => {
@@ -80,7 +86,7 @@ router.post('/payment-confirm/:id', (req, res) => {
 });
 
 // 後台：取得所有報名
-router.get('/registrations', (req, res) => {
+router.get('/registrations', adminAuth, (req, res) => {
   const db = getDb();
   const regs = db.prepare(`
     SELECT r.*, c.title as course_title, c.date as course_date
@@ -92,7 +98,7 @@ router.get('/registrations', (req, res) => {
 });
 
 // 後台：新增課程
-router.post('/courses', (req, res) => {
+router.post('/courses', adminAuth, (req, res) => {
   const db = getDb();
   const { title, description, date, time, location, duration_hours, price, capacity, category } = req.body;
   const result = db.prepare(`

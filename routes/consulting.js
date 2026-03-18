@@ -1,10 +1,16 @@
 // routes/consulting.js - 顧問預約 API
 const express = require('express');
 const router = express.Router();
+const basicAuth = require('express-basic-auth');
 const { getDb } = require('../db/database');
 const { sendConsultingConfirm } = require('./mailer');
 const axios = require('axios');
 const crypto = require('crypto');
+
+const adminAuth = basicAuth({
+  users: { [process.env.ADMIN_USER || 'stanley']: process.env.ADMIN_PASS || 'admin123' },
+  challenge: true
+});
 
 // 取得所有服務類型列表
 router.get('/services', (req, res) => {
@@ -46,14 +52,14 @@ router.post('/request', async (req, res) => {
 });
 
 // 取得所有預約（後台用）
-router.get('/list', (req, res) => {
+router.get('/list', adminAuth, (req, res) => {
   const db = getDb();
   const requests = db.prepare('SELECT * FROM consulting_requests ORDER BY created_at DESC').all();
   res.json(requests);
 });
 
 // 更新預約狀態（後台用）
-router.patch('/:id/status', (req, res) => {
+router.patch('/:id/status', adminAuth, (req, res) => {
   const db = getDb();
   const { status, total_amount, notes } = req.body;
   db.prepare('UPDATE consulting_requests SET status=?, total_amount=?, notes=? WHERE id=?')

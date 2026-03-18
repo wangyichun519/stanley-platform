@@ -517,7 +517,9 @@ function appendMsg(text, role) {
   const box = document.getElementById('ai-chat-box');
   const div = document.createElement('div');
   div.className = `ai-msg ai-msg--${role}`;
-  div.innerHTML = `<span>${text}</span>`;
+  const span = document.createElement('span');
+  span.textContent = text; // 防止 XSS
+  div.appendChild(span);
   box.appendChild(div);
   box.scrollTop = box.scrollHeight;
 }

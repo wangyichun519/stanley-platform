@@ -1,8 +1,14 @@
 // routes/shop.js - 選物商店 API
 const express = require('express');
 const router = express.Router();
+const basicAuth = require('express-basic-auth');
 const { getDb } = require('../db/database');
 const { sendOrderConfirm } = require('./mailer');
+
+const adminAuth = basicAuth({
+  users: { [process.env.ADMIN_USER || 'stanley']: process.env.ADMIN_PASS || 'admin123' },
+  challenge: true
+});
 
 // 取得商品列表
 router.get('/products', (req, res) => {
@@ -41,14 +47,14 @@ router.post('/order', async (req, res) => {
 });
 
 // 後台：取得所有訂單
-router.get('/orders', (req, res) => {
+router.get('/orders', adminAuth, (req, res) => {
   const db = getDb();
   const orders = db.prepare('SELECT * FROM orders ORDER BY created_at DESC').all();
   res.json(orders);
 });
 
 // 後台：更新訂單狀態
-router.patch('/orders/:id', (req, res) => {
+router.patch('/orders/:id', adminAuth, (req, res) => {
   const db = getDb();
   const { payment_status } = req.body;
   db.prepare('UPDATE orders SET payment_status=? WHERE id=?').run(payment_status, req.params.id);
@@ -56,7 +62,7 @@ router.patch('/orders/:id', (req, res) => {
 });
 
 // 後台：商品管理
-router.post('/products', (req, res) => {
+router.post('/products', adminAuth, (req, res) => {
   const db = getDb();
   const { name, category, description, price, stock, ltc_subsidy } = req.body;
   const result = db.prepare(`
@@ -66,7 +72,7 @@ router.post('/products', (req, res) => {
   res.json({ success: true, id: result.lastInsertRowid });
 });
 
-router.patch('/products/:id', (req, res) => {
+router.patch('/products/:id', adminAuth, (req, res) => {
   const db = getDb();
   const { stock, active, price } = req.body;
   db.prepare('UPDATE products SET stock=?, active=?, price=? WHERE id=?').run(stock, active ? 1 : 0, price, req.params.id);
