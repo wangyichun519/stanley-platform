@@ -115,10 +115,29 @@
         <label class="form-label">收據抬頭</label>
         <input type="text" class="form-control" id="reg_receipt_title" placeholder="收據抬頭">
       </div>
+      <!-- 付款說明 -->
+      <div class="card" style="background:#fff8e8;border-left:4px solid var(--earth);box-shadow:none;margin-bottom:16px;">
+        <p style="font-size:13px;color:#7a5c00;margin:0;">💡 <strong>付款說明：</strong>目前開放免費報名，付款系統即將開通。完成報名後，我們將透過 Email 或 LINE 通知您付款方式。</p>
+      </div>
       <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;" id="regSubmitBtn">
-        💳 確認報名並前往付款
+        ✅ 確認報名
       </button>
     </form>
+  </div>
+</div>
+
+<!-- 報名成功 Modal -->
+<div class="modal-overlay" id="successModal">
+  <div class="modal" style="text-align:center;max-width:400px;">
+    <div style="font-size:64px;margin-bottom:16px;">🎉</div>
+    <h3 style="color:var(--forest-deep);margin-bottom:12px;">報名成功！</h3>
+    <div id="successContent" style="color:#555;font-size:14px;line-height:1.8;margin-bottom:24px;"></div>
+    <div class="card" style="background:#e8f5e8;box-shadow:none;margin-bottom:20px;">
+      <p style="font-size:13px;color:var(--forest-deep);margin:0;">📲 付款通知將於 <strong>1-2 個工作天內</strong>寄送至您的 Email，請記得查收。</p>
+    </div>
+    <button onclick="document.getElementById('successModal').classList.remove('active')" class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;">
+      確認
+    </button>
   </div>
 </div>
 
@@ -217,22 +236,21 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
 
   const result = await apiPost('/api/training/register', data);
   if (result.success) {
-    // 發起 LINE Pay
-    const payResult = await apiPost('/api/linepay/request', {
-      amount: selectedCourse.price,
-      orderId: `TRN${result.registration_id}_${Date.now()}`,
-      orderType: 'training',
-      productName: selectedCourse.title
-    });
-    if (payResult.success) {
-      window.location.href = payResult.paymentUrl;
-    } else {
-      showToast('金流建立失敗，請稍後再試', 'error');
-    }
+    // 報名成功，顯示成功訊息（付款系統稍後開通）
+    closeModal();
+    document.getElementById('successContent').innerHTML = `
+      <p><strong>${selectedCourse.title}</strong></p>
+      <p>📅 ${selectedCourse.date} ${selectedCourse.time || ''}</p>
+      <p>📍 ${selectedCourse.location}</p>
+      <p>費用：<strong style="color:var(--earth)">NT$${selectedCourse.price.toLocaleString()}</strong></p>
+      <p style="margin-top:12px;">報名人：<strong>${data.name}</strong></p>
+    `;
+    document.getElementById('successModal').classList.add('active');
+    loadCourses(); // 更新名額
   } else {
     showToast('❌ ' + result.message, 'error');
   }
-  btn.textContent = '💳 確認報名並前往付款'; btn.disabled = false;
+  btn.textContent = '✅ 確認報名'; btn.disabled = false;
 });
 
 loadCourses();

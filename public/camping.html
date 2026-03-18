@@ -5,70 +5,421 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>療癒露營體驗 | Stanley 健康生活顧問</title>
 <link rel="stylesheet" href="/css/style.css">
+<style>
+.camp-type-card { cursor:pointer; transition:var(--transition); }
+.camp-type-card:hover { transform:translateY(-6px); box-shadow:0 12px 36px rgba(45,74,45,0.2); }
+
+.detail-modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:200; align-items:flex-start; justify-content:center; padding:20px; overflow-y:auto; }
+.detail-modal-overlay.active { display:flex; }
+.detail-modal { background:#fff; border-radius:var(--radius-lg); max-width:640px; width:100%; margin:auto; }
+.detail-modal-hero { border-radius:var(--radius-lg) var(--radius-lg) 0 0; padding:36px 32px; color:#fff; }
+.detail-modal-body { padding:32px; }
+.detail-section { margin-bottom:24px; }
+.detail-section h4 { font-size:15px; font-weight:700; color:var(--forest-deep); margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+.detail-list { list-style:none; display:grid; gap:6px; }
+.detail-list li { font-size:14px; color:#555; display:flex; gap:8px; }
+.timeline { display:grid; gap:0; }
+.timeline-item { display:grid; grid-template-columns:80px 1fr; gap:0; }
+.timeline-time { font-size:12px; font-weight:700; color:var(--forest-deep); padding:10px 8px 10px 0; border-right:2px solid var(--forest-light); text-align:right; }
+.timeline-content { padding:10px 0 10px 16px; font-size:13px; color:#555; }
+.note-box { background:#fff8e8; border-left:4px solid var(--earth); border-radius:0 var(--radius) var(--radius) 0; padding:14px 16px; }
+.note-box p { font-size:13px; color:#7a5c00; margin-bottom:6px; }
+.note-box p:last-child { margin:0; }
+
+.waitlist-section { background:linear-gradient(135deg,var(--forest-deep) 0%,var(--forest-mid) 100%); border-radius:var(--radius-lg); padding:40px; color:#fff; }
+.waitlist-form { background:rgba(255,255,255,0.12); border-radius:var(--radius); padding:24px; margin-top:24px; }
+.waitlist-form input, .waitlist-form select { background:rgba(255,255,255,0.92); border:none; }
+.waitlist-form label { color:rgba(255,255,255,0.9); }
+.feature-chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.feature-chip { background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.35); color:#fff; font-size:12px; padding:4px 12px; border-radius:16px; }
+</style>
 </head>
 <body>
 <div id="navbar"></div>
-<section class="hero" style="background:linear-gradient(135deg,var(--forest-deep) 0%,var(--forest-mid) 60%,#5a9a5a 100%);min-height:380px;">
+
+<section class="hero" style="background:linear-gradient(135deg,var(--forest-deep) 0%,var(--forest-mid) 60%,#5a9a5a 100%);min-height:400px;">
   <div class="container hero-content">
     <div class="hero-tag">LEISURE CARE CAMPING</div>
     <h1>休閒療癒露營體驗</h1>
     <p>銀髮輕鬆露營 × 三代同堂 × 漢方植物療癒<br>護理人員全程陪同，在花蓮山水間找回生命的溫度</p>
+    <div class="feature-chips" style="justify-content:center;margin-top:20px;">
+      <span class="feature-chip">🏥 護理師全程陪同</span>
+      <span class="feature-chip">♿ 無障礙設施</span>
+      <span class="feature-chip">🌿 漢方養生餐飲</span>
+      <span class="feature-chip">📸 活動照片紀錄</span>
+      <span class="feature-chip">🩺 免費健康量測</span>
+    </div>
   </div>
 </section>
 
+<!-- 活動類型 -->
 <section class="section">
   <div class="container">
     <div class="section-header">
       <div class="section-tag">CAMPING TYPES</div>
       <h2>活動類型</h2>
+      <p style="color:#666;margin-top:8px;">點選「了解更多」查看完整行程、注意事項與報名資訊</p>
     </div>
     <div class="grid-2">
-      <div class="card">
+      <!-- 銀髮輕鬆露營 -->
+      <div class="card camp-type-card" onclick="openDetail('senior')">
         <div style="background:linear-gradient(135deg,var(--forest-light),var(--forest-mid));border-radius:8px;padding:24px;margin-bottom:20px;color:#fff;text-align:center;">
-          <div style="font-size:48px;margin-bottom:8px;">👴👵</div>
-          <h3>銀髮輕鬆露營</h3>
+          <div style="font-size:56px;margin-bottom:8px;">👴👵</div>
+          <h3 style="color:#fff;margin:0;">銀髮輕鬆露營</h3>
+          <p style="color:rgba(255,255,255,0.85);font-size:13px;margin-top:6px;">65歲以上長者專屬療癒體驗</p>
         </div>
         <ul style="list-style:none;gap:8px;display:grid;color:#555;font-size:14px;margin-bottom:20px;">
-          <li>✅ 65歲以上長者優先</li>
+          <li>✅ 65歲以上長者優先報名</li>
           <li>✅ 無障礙設施露營區</li>
-          <li>✅ 護理人員全程陪同</li>
+          <li>✅ 護理師＋照服員全程陪同</li>
           <li>✅ 血壓血糖免費量測</li>
-          <li>✅ 漢方養生餐飲</li>
+          <li>✅ 漢方養生餐飲（低鈉低油）</li>
         </ul>
         <div style="display:flex;justify-content:space-between;align-items:center;">
           <span class="price">NT$2,200 <span class="price-unit">/人</span></span>
-          <a href="/consulting.html" class="btn btn-primary" style="padding:8px 20px;">了解更多</a>
+          <button class="btn btn-primary" style="padding:8px 20px;" onclick="event.stopPropagation();openDetail('senior')">了解更多</button>
         </div>
       </div>
-      <div class="card">
+
+      <!-- 三代同堂 -->
+      <div class="card camp-type-card" onclick="openDetail('family')">
         <div style="background:linear-gradient(135deg,var(--earth),var(--bark));border-radius:8px;padding:24px;margin-bottom:20px;color:#fff;text-align:center;">
-          <div style="font-size:48px;margin-bottom:8px;">👶👨👴</div>
-          <h3>三代同堂 × 咖啡體驗</h3>
+          <div style="font-size:56px;margin-bottom:8px;">👶👨👴</div>
+          <h3 style="color:#fff;margin:0;">三代同堂 × 咖啡體驗</h3>
+          <p style="color:rgba(255,255,255,0.85);font-size:13px;margin-top:6px;">全家一起的療癒假期</p>
         </div>
         <ul style="list-style:none;gap:8px;display:grid;color:#555;font-size:14px;margin-bottom:20px;">
           <li>✅ 祖孫三代一起參與</li>
-          <li>✅ 花蓮精品咖啡品飲</li>
+          <li>✅ 花蓮精品咖啡品飲體驗</li>
           <li>✅ 代間互動遊戲設計</li>
-          <li>✅ 漢方植物認識體驗</li>
-          <li>✅ 活動照片紀錄</li>
+          <li>✅ 漢方植物認識＋採集體驗</li>
+          <li>✅ 活動照片精美紀錄</li>
         </ul>
         <div style="display:flex;justify-content:space-between;align-items:center;">
           <span class="price">NT$2,800 <span class="price-unit">/人</span></span>
-          <a href="/consulting.html" class="btn btn-primary" style="padding:8px 20px;">了解更多</a>
+          <button class="btn btn-primary" style="padding:8px 20px;" onclick="event.stopPropagation();openDetail('family')">了解更多</button>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<section class="section" style="background:var(--forest-deep);color:#fff;text-align:center;">
-  <h2 style="font-family:'Noto Serif TC';margin-bottom:16px;color:#fff;">宜花東合作中 🏕️</h2>
-  <p style="color:rgba(255,255,255,0.8);margin-bottom:24px;">我們正積極與花蓮、宜蘭、台東各地優質露營區洽談合作，提供最適合銀髮長者的無障礙戶外療癒體驗。</p>
-  <p style="color:rgba(255,255,255,0.7);font-size:14px;margin-bottom:24px;">想提早知道開放報名日期？歡迎留下聯絡資訊</p>
-  <a href="/consulting.html" class="btn btn-white">留下聯絡資訊</a>
+<!-- 我們的特色 -->
+<section class="section" style="background:var(--mist);">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag">WHY CHOOSE US</div>
+      <h2>為什麼選擇我們</h2>
+    </div>
+    <div class="grid-3">
+      <div class="card" style="text-align:center;">
+        <div style="font-size:48px;margin-bottom:16px;">🏥</div>
+        <h3 style="font-size:17px;margin-bottom:8px;color:var(--forest-deep);">專業醫護陪同</h3>
+        <p style="font-size:14px;color:#666;line-height:1.7;">具執照護理師＋照服員全程在場，提供緊急狀況處置，讓家屬安心放心。</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div style="font-size:48px;margin-bottom:16px;">♿</div>
+        <h3 style="font-size:17px;margin-bottom:8px;color:var(--forest-deep);">無障礙友善環境</h3>
+        <p style="font-size:14px;color:#666;line-height:1.7;">精選花蓮無障礙露營場地，平坦步道、無障礙廁所、輪椅可進入的帳篷區。</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div style="font-size:48px;margin-bottom:16px;">🌿</div>
+        <h3 style="font-size:17px;margin-bottom:8px;color:var(--forest-deep);">漢方療癒課程</h3>
+        <p style="font-size:14px;color:#666;line-height:1.7;">中醫師設計的漢方養生課程，認識在地藥草植物，感受自然療癒的力量。</p>
+      </div>
+    </div>
+  </div>
 </section>
+
+<!-- 合作夥伴與場地 -->
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag">LOCATION</div>
+      <h2>活動場地與地點</h2>
+    </div>
+    <div class="grid-2" style="align-items:start;">
+      <div class="card" style="overflow:hidden;padding:0;">
+        <div style="background:linear-gradient(135deg,#e8f5e8,#c8e6c8);height:200px;display:flex;align-items:center;justify-content:center;font-size:72px;">🏔️</div>
+        <div style="padding:24px;">
+          <h3 style="color:var(--forest-deep);margin-bottom:8px;">花蓮壽豐秀姑巒溪畔</h3>
+          <p style="font-size:14px;color:#666;line-height:1.7;margin-bottom:12px;">依山傍水的無障礙露營區，遠眺中央山脈，溪畔涼風，是銀髮族最舒適的戶外療癒環境。</p>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;">
+            <span style="background:#e8f5e8;color:var(--forest-deep);font-size:12px;padding:4px 10px;border-radius:12px;">🚗 花蓮市區約40分鐘</span>
+            <span style="background:#e8f5e8;color:var(--forest-deep);font-size:12px;padding:4px 10px;border-radius:12px;">♿ 無障礙通道</span>
+            <span style="background:#e8f5e8;color:var(--forest-deep);font-size:12px;padding:4px 10px;border-radius:12px;">🏕️ 全套露營設施</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:16px;">
+          <h4 style="color:var(--forest-deep);margin-bottom:8px;">🗓️ 預計開放場次</h4>
+          <div style="display:grid;gap:10px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--mist);border-radius:8px;">
+              <div>
+                <div style="font-weight:700;font-size:14px;">春季場（銀髮露營）</div>
+                <div style="font-size:12px;color:#888;margin-top:2px;">2026年4月 / 2天1夜</div>
+              </div>
+              <span style="background:#fff8e8;color:var(--earth);font-size:12px;padding:4px 10px;border-radius:10px;font-weight:600;">籌備中</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--mist);border-radius:8px;">
+              <div>
+                <div style="font-weight:700;font-size:14px;">夏季場（三代同堂）</div>
+                <div style="font-size:12px;color:#888;margin-top:2px;">2026年7月 / 2天1夜</div>
+              </div>
+              <span style="background:#fff8e8;color:var(--earth);font-size:12px;padding:4px 10px;border-radius:10px;font-weight:600;">籌備中</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--mist);border-radius:8px;">
+              <div>
+                <div style="font-weight:700;font-size:14px;">秋季場（漢方療癒）</div>
+                <div style="font-size:12px;color:#888;margin-top:2px;">2026年10月 / 3天2夜</div>
+              </div>
+              <span style="background:#fff8e8;color:var(--earth);font-size:12px;padding:4px 10px;border-radius:10px;font-weight:600;">籌備中</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 候補通知 -->
+<section class="section">
+  <div class="container">
+    <div class="waitlist-section">
+      <div style="text-align:center;margin-bottom:8px;">
+        <div class="section-tag" style="color:rgba(255,255,255,0.7);">JOIN WAITLIST</div>
+        <h2 style="color:#fff;font-family:'Noto Serif TC';margin-bottom:12px;">🏕️ 搶先登記，優先通知</h2>
+        <p style="color:rgba(255,255,255,0.8);font-size:15px;">我們正積極規劃中！留下資訊，開放報名第一時間通知您，登記者享有<strong style="color:#ffd700;">早鳥優惠 NT$200</strong></p>
+      </div>
+      <div class="waitlist-form">
+        <form id="waitlistForm">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div class="form-group">
+              <label class="form-label">姓名<span class="required">*</span></label>
+              <input type="text" class="form-control" id="wl_name" required placeholder="您的姓名">
+            </div>
+            <div class="form-group">
+              <label class="form-label">電話<span class="required">*</span></label>
+              <input type="tel" class="form-control" id="wl_phone" required placeholder="0912-345-678">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" id="wl_email" placeholder="yourname@email.com">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div class="form-group">
+              <label class="form-label">有興趣的活動</label>
+              <select class="form-control" id="wl_type">
+                <option value="senior">銀髮輕鬆露營</option>
+                <option value="family">三代同堂咖啡體驗</option>
+                <option value="both">兩者都有興趣</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">參加人數</label>
+              <select class="form-control" id="wl_count">
+                <option value="1">1人</option>
+                <option value="2" selected>2人</option>
+                <option value="3-4">3-4人</option>
+                <option value="5+">5人以上</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-white" style="width:100%;justify-content:center;padding:14px;font-size:15px;" id="wlSubmitBtn">
+            🔔 立即登記候補通知
+          </button>
+        </form>
+        <div id="wlSuccess" style="display:none;text-align:center;padding:20px;">
+          <div style="font-size:48px;margin-bottom:12px;">✅</div>
+          <h3 style="color:#fff;margin-bottom:8px;">已成功登記！</h3>
+          <p style="color:rgba(255,255,255,0.85);font-size:14px;">感謝您的登記，開放報名時我們將第一時間通知您，並保留早鳥優惠名額。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 詳情 Modal - 銀髮輕鬆露營 -->
+<div class="detail-modal-overlay" id="detailModal">
+  <div class="detail-modal" id="detailContent">
+    <!-- 動態填入 -->
+  </div>
+</div>
 
 <div id="footer"></div>
 <script src="/js/components.js"></script>
+<script>
+
+const campDetails = {
+  senior: {
+    title: '銀髮輕鬆露營',
+    icon: '👴👵',
+    gradient: 'linear-gradient(135deg,var(--forest-light),var(--forest-mid))',
+    price: 2200,
+    duration: '2天1夜',
+    capacity: '每梯次12人（每位長者限帶1位家屬）',
+    includes: ['帳篷設備與寢具全套', '三餐漢方養生餐飲（低鈉低油）', '護理師＋照服員全程陪同', '早晨健康量測（血壓、血糖、血氧）', '漢方植物認識課程（90分鐘）', '有氧律動體操課（60分鐘）', '活動全程照片紀錄光碟'],
+    schedule: [
+      { time: '第一天', events: [
+        { t: '09:00', e: '集合出發（花蓮市區接送）' },
+        { t: '10:30', e: '抵達露營區，帳篷安頓' },
+        { t: '12:00', e: '養生午餐 🥬' },
+        { t: '14:00', e: '漢方植物採集與認識課程' },
+        { t: '16:00', e: '健康量測、自由休憩' },
+        { t: '18:00', e: '夕陽晚餐 × 輕音樂' },
+        { t: '20:00', e: '星空夜話、就寢' }
+      ]},
+      { time: '第二天', events: [
+        { t: '07:00', e: '晨間量測、有氧律動體操' },
+        { t: '08:00', e: '早餐' },
+        { t: '09:30', e: '溪畔漫步（無障礙步道）' },
+        { t: '11:00', e: '收帳、合照留念' },
+        { t: '12:00', e: '午餐後返回市區' }
+      ]}
+    ],
+    notes: [
+      '報名需填寫健康問卷，護理師會事先評估參加適切性',
+      '輕度失智長者需有家屬陪同，重度失智請先電話洽詢',
+      '氣候不佳或颱風警報時將延期，不收取額外費用',
+      '自備常用藥物、舒適換洗衣物、防蚊用品',
+      '場地設有輪椅通道，電動輪椅可提前預約充電'
+    ]
+  },
+  family: {
+    title: '三代同堂 × 咖啡體驗',
+    icon: '👶👨👴',
+    gradient: 'linear-gradient(135deg,var(--earth),var(--bark))',
+    price: 2800,
+    duration: '2天1夜',
+    capacity: '每梯次20人（以家庭為單位報名，2-6人）',
+    includes: ['帳篷設備與寢具全套', '三餐（含兒童餐）', '花蓮精品咖啡品飲體驗（SCA Q Grader 主持）', '代間互動遊戲工作坊', '漢方植物認識＋DIY香包製作', '活動精美照片集錦（Email 寄送）', 'Stanley 老師咖啡豆伴手禮 1 包'],
+    schedule: [
+      { time: '第一天', events: [
+        { t: '09:00', e: '家庭報到、相見歡遊戲' },
+        { t: '10:30', e: '帳篷搭建（由孫子輩協助長輩）' },
+        { t: '12:00', e: '大鍋飯午餐，共同料理體驗' },
+        { t: '14:00', e: 'Stanley 老師咖啡品飲課 ☕' },
+        { t: '15:30', e: '漢方植物認識＋DIY香包製作' },
+        { t: '17:30', e: '代間競技：親子趣味運動會' },
+        { t: '19:00', e: '烤肉晚餐 × 溫馨夜話' },
+        { t: '20:30', e: '天文觀星（晴天時）' }
+      ]},
+      { time: '第二天', events: [
+        { t: '07:00', e: '清晨散步，自然醒活動' },
+        { t: '08:00', e: '早餐＋回顧昨日精彩' },
+        { t: '09:30', e: '家族接力賽、拍大合照' },
+        { t: '11:00', e: '收帳整理、依依不捨的告別' },
+        { t: '12:00', e: '午餐後返家' }
+      ]}
+    ],
+    notes: [
+      '3歲以下幼兒免費，需自備嬰兒床或攜帶型床具',
+      '活動設計涵蓋3歲至90歲，真正三代皆宜',
+      '咖啡品飲可選低因版本，長輩與兒童均可參與',
+      '場地設有救護設備，工作人員具急救訓練',
+      '下雨備案：室內大廳改為桌遊與手作課程，活動不中斷'
+    ]
+  }
+};
+
+function openDetail(type) {
+  const d = campDetails[type];
+  const scheduleHtml = d.schedule.map(day => `
+    <div style="margin-bottom:16px;">
+      <div style="font-weight:700;color:var(--forest-deep);margin-bottom:8px;">${day.time}</div>
+      <div class="timeline">
+        ${day.events.map(ev => `
+          <div class="timeline-item">
+            <div class="timeline-time">${ev.t}</div>
+            <div class="timeline-content">${ev.e}</div>
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+
+  document.getElementById('detailContent').innerHTML = `
+    <div class="detail-modal-hero" style="background:${d.gradient};">
+      <button onclick="closeDetail()" style="float:right;background:rgba(255,255,255,0.3);border:none;color:#fff;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;line-height:32px;">×</button>
+      <div style="font-size:52px;margin-bottom:12px;">${d.icon}</div>
+      <h2 style="color:#fff;margin-bottom:6px;">${d.title}</h2>
+      <p style="color:rgba(255,255,255,0.85);font-size:14px;">⏱️ ${d.duration} ｜ 👥 ${d.capacity}</p>
+      <div style="margin-top:16px;">
+        <span style="font-size:26px;font-weight:800;color:#fff;">NT$${d.price.toLocaleString()}</span>
+        <span style="color:rgba(255,255,255,0.8);font-size:14px;margin-left:4px;">/人（含全套服務）</span>
+      </div>
+    </div>
+    <div class="detail-modal-body">
+      <div class="detail-section">
+        <h4>🎁 費用包含</h4>
+        <ul class="detail-list">
+          ${d.includes.map(item => `<li><span>✅</span><span>${item}</span></li>`).join('')}
+        </ul>
+      </div>
+      <div class="detail-section">
+        <h4>🗓️ 活動行程</h4>
+        ${scheduleHtml}
+      </div>
+      <div class="detail-section">
+        <h4>📋 注意事項</h4>
+        <div class="note-box">
+          ${d.notes.map(n => `<p>• ${n}</p>`).join('')}
+        </div>
+      </div>
+      <div style="background:var(--mist);border-radius:var(--radius);padding:16px;margin-bottom:24px;text-align:center;">
+        <p style="font-size:14px;color:#555;margin-bottom:0;">🚧 報名系統即將開放！歡迎先在下方<strong>登記候補通知</strong>，開放時第一時間通知您。</p>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <button onclick="closeDetail();document.getElementById('wlSubmitBtn').scrollIntoView({behavior:'smooth'})" class="btn btn-primary" style="justify-content:center;padding:12px;">
+          🔔 登記候補通知
+        </button>
+        <a href="https://line.me/R/ti/p/@stanley" class="btn btn-outline" style="justify-content:center;padding:12px;text-decoration:none;">
+          💬 LINE 詢問詳情
+        </a>
+      </div>
+    </div>`;
+  document.getElementById('detailModal').classList.add('active');
+}
+
+function closeDetail() {
+  document.getElementById('detailModal').classList.remove('active');
+}
+
+document.getElementById('detailModal').addEventListener('click', function(e) {
+  if (e.target === this) closeDetail();
+});
+
+document.getElementById('waitlistForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('wlSubmitBtn');
+  btn.textContent = '提交中...'; btn.disabled = true;
+
+  const data = {
+    name: document.getElementById('wl_name').value,
+    phone: document.getElementById('wl_phone').value,
+    email: document.getElementById('wl_email').value,
+    type: document.getElementById('wl_type').value,
+    count: document.getElementById('wl_count').value
+  };
+
+  // 用 consulting 預約 API 暫代
+  try {
+    await apiPost('/api/consulting/request', {
+      org_name: `露營候補：${data.name}（${data.count}人）`,
+      contact_name: data.name,
+      phone: data.phone,
+      email: data.email || 'no-email@example.com',
+      service_type: `camping_${data.type}`,
+      description: `露營候補通知登記，活動類型：${data.type}，人數：${data.count}人`,
+      preferred_time: '待開放通知'
+    });
+  } catch(err) {
+    // 不影響使用者體驗
+  }
+
+  document.getElementById('waitlistForm').style.display = 'none';
+  document.getElementById('wlSuccess').style.display = 'block';
+});
+</script>
 </body>
 </html>

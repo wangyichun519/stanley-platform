@@ -153,18 +153,48 @@
           <span>合計</span><span style="color:var(--earth);" id="checkoutTotal"></span>
         </div>
       </div>
-      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;">
-        💳 前往 LINE Pay 付款
+      <div class="card" style="background:#e8f5e8;border-left:4px solid var(--forest-mid);box-shadow:none;margin-bottom:16px;">
+        <p style="font-size:13px;color:var(--forest-deep);margin:0;">💡 <strong>付款方式：</strong>送出訂單後，我們將透過 LINE 或 Email 與您確認付款（轉帳/LINE Pay），感謝您的耐心。</p>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;" id="checkoutSubmitBtn">
+        ✅ 送出訂單
       </button>
     </form>
+  </div>
+</div>
+
+<!-- 訂單完成 Modal -->
+<div class="modal-overlay" id="orderSuccessModal" style="z-index:500;">
+  <div class="modal" style="text-align:center;max-width:400px;">
+    <div style="font-size:64px;margin-bottom:16px;">🎉</div>
+    <h3 style="color:var(--forest-deep);margin-bottom:12px;">訂單已送出！</h3>
+    <div id="orderSuccessContent" style="color:#555;font-size:14px;line-height:1.8;margin-bottom:20px;"></div>
+    <div class="card" style="background:#e8f5e8;box-shadow:none;margin-bottom:20px;text-align:left;">
+      <p style="font-size:13px;color:var(--forest-deep);margin:0;">📲 我們將於 <strong>1-2 個工作天</strong>內透過 LINE 或 Email 通知您付款方式及出貨資訊。</p>
+    </div>
+    <a href="https://line.me/R/ti/p/@stanley" target="_blank" class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;margin-bottom:10px;text-decoration:none;">
+      💬 LINE 加速確認付款
+    </a>
+    <button onclick="document.getElementById('orderSuccessModal').classList.remove('active')" style="width:100%;background:none;border:none;color:#888;cursor:pointer;padding:8px;">
+      稍後再說
+    </button>
   </div>
 </div>
 
 <div id="footer"></div>
 <script src="/js/components.js"></script>
 <script>
-let allProducts = [], cart = [], currentFilter = 'all';
+let allProducts = [], currentFilter = 'all';
 const catEmoji = { coffee:'☕', tcm:'🌿', ltc:'🏥', camping:'🏕️' };
+
+// 購物車 localStorage 持久化
+function loadCart() {
+  try { return JSON.parse(localStorage.getItem('stanley_cart') || '[]'); } catch { return []; }
+}
+function saveCart(c) {
+  try { localStorage.setItem('stanley_cart', JSON.stringify(c)); } catch {}
+}
+let cart = loadCart();
 
 async function loadProducts() {
   allProducts = await apiGet('/api/shop/products');
@@ -205,6 +235,7 @@ function addToCart(id) {
   const existing = cart.find(x => x.id === id);
   if (existing) existing.qty++;
   else cart.push({ id: p.id, name: p.name, price: p.price, qty: 1, emoji: catEmoji[p.category]||'📦' });
+  saveCart(cart);
   updateCart();
   showToast('✅ 已加入購物車！', 'success');
 }
@@ -235,6 +266,7 @@ function updateCart() {
 function changeQty(idx, delta) {
   cart[idx].qty += delta;
   if (cart[idx].qty <= 0) cart.splice(idx, 1);
+  saveCart(cart);
   updateCart();
 }
 
@@ -258,6 +290,9 @@ function closeCheckout() { document.getElementById('checkoutModal').classList.re
 
 document.getElementById('checkoutForm').addEventListener('submit', async (e) => {
   e.preventDefault();
+  const btn = document.getElementById('checkoutSubmitBtn');
+  btn.textContent = '處理中...'; btn.disabled = true;
+
   const total = cart.reduce((s,i) => s + i.price * i.qty, 0);
   const orderData = {
     customer_name: document.getElementById('co_name').value,
@@ -270,16 +305,27 @@ document.getElementById('checkoutForm').addEventListener('submit', async (e) => 
   };
   const result = await apiPost('/api/shop/order', orderData);
   if (result.success) {
-    const payResult = await apiPost('/api/linepay/request', {
-      amount: total,
-      orderId: result.order_no,
-      orderType: 'shop',
-      productName: `選物商店訂單 #${result.order_no}`
-    });
-    if (payResult.success) { window.location.href = payResult.paymentUrl; }
-    else showToast('金流建立失敗', 'error');
-  } else showToast('❌ ' + result.message, 'error');
+    // 訂單已儲存，顯示成功訊息（不進行 LINE Pay）
+    closeCheckout();
+    document.getElementById('orderSuccessContent').innerHTML = `
+      <p>訂單編號：<strong>${result.order_no}</strong></p>
+      <p>訂購人：<strong>${orderData.customer_name}</strong></p>
+      <p>配送方式：<strong>${orderData.shipping_method === 'delivery' ? '宅配到府' : '門市取貨'}</strong></p>
+      <p>訂單金額：<strong style="color:var(--earth)">NT$${total.toLocaleString()}</strong></p>
+    `;
+    document.getElementById('orderSuccessModal').classList.add('active');
+    // 清空購物車
+    cart = [];
+    saveCart(cart);
+    updateCart();
+  } else {
+    showToast('❌ ' + result.message, 'error');
+  }
+  btn.textContent = '✅ 送出訂單'; btn.disabled = false;
 });
+
+// 初始化購物車顯示（從 localStorage 恢復）
+updateCart();
 
 // URL 參數自動篩選
 const urlCat = new URLSearchParams(location.search).get('cat');
