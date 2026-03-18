@@ -1,4 +1,9 @@
 // public/js/components.js - 共用導覽列與頁尾
+
+// ⚠️ 請到 LINE Official Account Manager → 帳號設定 → 基本設定 → LINE ID 查詢
+// 找到你的 LINE ID (例如 @abc1234)，填入下方
+const LINE_OFFICIAL_ID = '@stanley_hualien'; // ← 改成你的正確 LINE Official Account ID
+
 const NAV_LINKS = [
   { href: '/index.html', label: '首頁' },
   { href: '/consulting.html', label: '🏥 顧問服務' },
@@ -52,9 +57,10 @@ function renderFooter() {
         </div>
         <div>
           <h4>聯絡我們</h4>
-          <a href="mailto:">Email 諮詢</a>
-          <a href="#">花蓮 × 宜花東服務</a>
-          <a href="/admin">後台管理</a>
+          <a href="mailto:wangyichun519@gmail.com">📧 Email 諮詢</a>
+          <a href="https://line.me/R/ti/p/${LINE_OFFICIAL_ID}" target="_blank" rel="noopener">💬 LINE 加入好友</a>
+          <a href="#">📍 花蓮 × 宜花東服務</a>
+          <a href="/admin">🔒 後台管理</a>
         </div>
       </div>
       <div class="footer-bottom">

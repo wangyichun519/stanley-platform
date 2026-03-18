@@ -172,7 +172,7 @@
     <div class="card" style="background:#e8f5e8;box-shadow:none;margin-bottom:20px;text-align:left;">
       <p style="font-size:13px;color:var(--forest-deep);margin:0;">📲 我們將於 <strong>1-2 個工作天</strong>內透過 LINE 或 Email 通知您付款方式及出貨資訊。</p>
     </div>
-    <a href="https://line.me/R/ti/p/@stanley" target="_blank" class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;margin-bottom:10px;text-decoration:none;">
+    <a id="lineOrderLink" href="#" target="_blank" class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;margin-bottom:10px;text-decoration:none;">
       💬 LINE 加速確認付款
     </a>
     <button onclick="document.getElementById('orderSuccessModal').classList.remove('active')" style="width:100%;background:none;border:none;color:#888;cursor:pointer;padding:8px;">
@@ -323,6 +323,9 @@ document.getElementById('checkoutForm').addEventListener('submit', async (e) => 
   }
   btn.textContent = '✅ 送出訂單'; btn.disabled = false;
 });
+
+// 設定 LINE 連結
+document.getElementById('lineOrderLink').href = `https://line.me/R/ti/p/${LINE_OFFICIAL_ID}`;
 
 // 初始化購物車顯示（從 localStorage 恢復）
 updateCart();

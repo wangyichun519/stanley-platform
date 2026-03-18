@@ -98,6 +98,37 @@
 .cta-section h2 { color: #fff; font-size: 32px; margin-bottom: 16px; }
 .cta-section p { color: rgba(255,255,255,0.85); margin-bottom: 32px; font-size: 17px; }
 
+/* Expansion Roadmap */
+.roadmap-section { background: var(--forest-deep); color: #fff; }
+.roadmap-track { display: flex; gap: 0; overflow-x: auto; padding: 40px 0 20px; scrollbar-width: none; }
+.roadmap-track::-webkit-scrollbar { display: none; }
+.roadmap-node { flex: 1; min-width: 200px; text-align: center; position: relative; }
+.roadmap-node::before { content: ''; position: absolute; top: 28px; left: 50%; right: -50%; height: 2px; background: rgba(255,255,255,0.2); z-index: 0; }
+.roadmap-node:last-child::before { display: none; }
+.roadmap-dot { width: 56px; height: 56px; border-radius: 50%; background: var(--forest-mid); border: 3px solid var(--forest-light); display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 16px; position: relative; z-index: 1; }
+.roadmap-dot.active { background: var(--forest-light); border-color: #fff; box-shadow: 0 0 20px rgba(122,173,110,0.6); }
+.roadmap-dot.future { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.25); }
+.roadmap-label { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.roadmap-sub { font-size: 12px; color: rgba(255,255,255,0.6); }
+.roadmap-status { display: inline-block; font-size: 11px; padding: 2px 10px; border-radius: 12px; margin-top: 8px; }
+.status-now { background: var(--forest-light); color: var(--forest-deep); font-weight: 700; }
+.status-next { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.8); }
+.status-dream { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.5); }
+
+/* New Products */
+.new-product-card { background:#fff; border-radius:var(--radius-lg); overflow:hidden; box-shadow:0 4px 20px var(--shadow); transition:var(--transition); display:flex; flex-direction:column; }
+.new-product-card:hover { transform:translateY(-5px); box-shadow:0 12px 36px rgba(45,74,45,0.18); }
+.new-badge { background:var(--earth); color:#fff; font-size:11px; font-weight:700; padding:3px 10px; border-radius:0 0 8px 0; position:absolute; top:0; left:0; }
+
+/* Testimonials */
+.testimonial-card { background:#fff; border-radius:var(--radius-lg); padding:28px; box-shadow:0 4px 20px var(--shadow); position:relative; }
+.testimonial-card::before { content:'"'; font-size:80px; color:var(--forest-light); position:absolute; top:-10px; left:20px; font-family:'Noto Serif TC'; line-height:1; opacity:0.5; }
+.testimonial-text { font-size:14px; color:#555; line-height:1.8; margin-bottom:16px; font-style:italic; }
+.testimonial-author { display:flex; align-items:center; gap:12px; }
+.testimonial-avatar { width:40px; height:40px; border-radius:50%; background:var(--forest-mid); display:flex; align-items:center; justify-content:center; font-size:18px; }
+.testimonial-name { font-weight:700; font-size:14px; color:var(--charcoal); }
+.testimonial-role { font-size:12px; color:#888; }
+
 @media (max-width: 900px) {
   .hero-home { grid-template-columns: 1fr; min-height: auto; }
   .hero-right { display: none; }
@@ -233,6 +264,146 @@
         </div>
       </div>
       <div class="story-visual">🌿</div>
+    </div>
+  </div>
+</section>
+
+<!-- 新品上架 -->
+<section class="section" style="background:var(--mist);">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag">NEW ARRIVALS</div>
+      <h2>精選咖啡新品</h2>
+      <p>來自世界頂級莊園 × 台灣本土精品，每一杯都是一場旅行</p>
+    </div>
+    <div class="grid-3" style="margin-bottom:32px;">
+      <div class="new-product-card" style="position:relative;">
+        <div class="new-badge">🆕 新品</div>
+        <div style="background:linear-gradient(135deg,#f0e8d0,#d4c090);height:160px;display:flex;align-items:center;justify-content:center;font-size:64px;">☕</div>
+        <div style="padding:20px;flex:1;display:flex;flex-direction:column;">
+          <div style="font-size:11px;color:var(--earth);font-weight:700;letter-spacing:1px;margin-bottom:6px;">TAIWAN × ORGANIC</div>
+          <h3 style="font-size:16px;color:var(--forest-deep);margin-bottom:8px;">阿里山他扶芽有機咖啡豆</h3>
+          <p style="font-size:13px;color:#888;line-height:1.6;flex:1;">海拔1600米，有機認證。風味：花香、黑糖、奶油尾韻。來自他扶芽農莊的誠意之作。</p>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;">
+            <span class="price">NT$780 <span class="price-unit">/150g</span></span>
+            <a href="/shop.html?cat=coffee" class="btn btn-primary" style="padding:8px 16px;font-size:13px;">加入購物車</a>
+          </div>
+        </div>
+      </div>
+      <div class="new-product-card" style="position:relative;">
+        <div class="new-badge">🌹 限量進口</div>
+        <div style="background:linear-gradient(135deg,#ffe8f0,#f8c8d8);height:160px;display:flex;align-items:center;justify-content:center;font-size:64px;">🌹</div>
+        <div style="padding:20px;flex:1;display:flex;flex-direction:column;">
+          <div style="font-size:11px;color:#d05080;font-weight:700;letter-spacing:1px;margin-bottom:6px;">COLOMBIA × FINCA EL PARAÍSO</div>
+          <h3 style="font-size:16px;color:var(--forest-deep);margin-bottom:8px;">天堂莊園玫瑰茶咖啡</h3>
+          <p style="font-size:13px;color:#888;line-height:1.6;flex:1;">哥倫比亞頂級莊園玫瑰茶發酵處理。風味：玫瑰、荔枝、茉莉。限量進口，售完為止。</p>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;">
+            <span class="price">NT$1,280 <span class="price-unit">/100g</span></span>
+            <a href="/shop.html?cat=coffee" class="btn btn-primary" style="padding:8px 16px;font-size:13px;">加入購物車</a>
+          </div>
+        </div>
+      </div>
+      <div class="new-product-card" style="position:relative;">
+        <div class="new-badge">🍋 夏季限定</div>
+        <div style="background:linear-gradient(135deg,#f0f8d0,#c8e870);height:160px;display:flex;align-items:center;justify-content:center;font-size:64px;">🍋</div>
+        <div style="padding:20px;flex:1;display:flex;flex-direction:column;">
+          <div style="font-size:11px;color:#7a9a00;font-weight:700;letter-spacing:1px;margin-bottom:6px;">HUALIEN × COLD BREW</div>
+          <h3 style="font-size:16px;color:var(--forest-deep);margin-bottom:8px;">青檸香頌冷萃特調包</h3>
+          <p style="font-size:13px;color:#888;line-height:1.6;flex:1;">花蓮咖啡 × 台灣青檸冷萃特調。清爽果酸、咖啡甘甜，無糖天然，夏季最佳療癒飲品。</p>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;">
+            <span class="price">NT$480 <span class="price-unit">/10包</span></span>
+            <a href="/shop.html?cat=coffee" class="btn btn-primary" style="padding:8px 16px;font-size:13px;">加入購物車</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;">
+      <a href="/shop.html" class="btn btn-outline" style="padding:12px 36px;">查看全部商品 →</a>
+    </div>
+  </div>
+</section>
+
+<!-- 品牌擴張藍圖 -->
+<section class="section roadmap-section">
+  <div class="container">
+    <div class="section-header" style="color:#fff;">
+      <div class="section-tag" style="color:var(--forest-light);">OUR JOURNEY</div>
+      <h2 style="color:#fff;">從花蓮出發，走向世界</h2>
+      <p style="color:rgba(255,255,255,0.7);">一個在地療癒品牌的全球夢想，從宜花東開始，讓台灣的照護溫度被世界看見</p>
+    </div>
+    <div class="roadmap-track">
+      <div class="roadmap-node">
+        <div class="roadmap-dot active">🌿</div>
+        <div class="roadmap-label">花蓮</div>
+        <div class="roadmap-sub">品牌發源地<br>Coffee Priority × 漢方</div>
+        <span class="roadmap-status status-now">✦ 現在進行中</span>
+      </div>
+      <div class="roadmap-node">
+        <div class="roadmap-dot active">🏔️</div>
+        <div class="roadmap-label">宜蘭 × 台東</div>
+        <div class="roadmap-sub">宜花東三角<br>偏鄉長照擴展</div>
+        <span class="roadmap-status status-now">✦ 擴展中</span>
+      </div>
+      <div class="roadmap-node">
+        <div class="roadmap-dot future">🌏</div>
+        <div class="roadmap-label">全台灣</div>
+        <div class="roadmap-sub">北中南服務據點<br>線上課程全台開班</div>
+        <span class="roadmap-status status-next">→ 下一步</span>
+      </div>
+      <div class="roadmap-node">
+        <div class="roadmap-dot future">✈️</div>
+        <div class="roadmap-label">日本 × 新加坡</div>
+        <div class="roadmap-sub">台灣長照輸出<br>亞太高齡照護市場</div>
+        <span class="roadmap-status status-dream">◎ 2027 目標</span>
+      </div>
+      <div class="roadmap-node">
+        <div class="roadmap-dot future">🌍</div>
+        <div class="roadmap-label">全球</div>
+        <div class="roadmap-sub">Taiwan Care Brand<br>讓世界看見台灣溫度</div>
+        <span class="roadmap-status status-dream">◎ 夢想</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 客戶見證 -->
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag">TESTIMONIALS</div>
+      <h2>他們這麼說</h2>
+    </div>
+    <div class="grid-3">
+      <div class="testimonial-card fade-up fade-up-1">
+        <p class="testimonial-text">參加 SNQ 輔導後，機構的服務品質受到評核委員高度肯定。Stanley 對評鑑流程的了解讓我們少走很多冤枉路。</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">🏥</div>
+          <div>
+            <div class="testimonial-name">王主任</div>
+            <div class="testimonial-role">花蓮某護理之家主任</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card fade-up fade-up-2">
+        <p class="testimonial-text">銀髮咖啡師課程讓我媽媽的眼睛都亮了！她說這是她最期待的一週。老師很有耐心，課程設計也很用心。</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">☕</div>
+          <div>
+            <div class="testimonial-name">陳小姐</div>
+            <div class="testimonial-role">學員家屬 / 花蓮市</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card fade-up fade-up-3">
+        <p class="testimonial-text">長照3.0智慧輔具補助申請很複雜，Stanley 一步步協助我們，最後成功申請到離床感應器，節省了大量自費支出。</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">🌿</div>
+          <div>
+            <div class="testimonial-name">林照管員</div>
+            <div class="testimonial-role">照顧管理專員 / 宜蘭</div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
