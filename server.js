@@ -130,6 +130,65 @@ app.post('/api/coffee-ai', async (req, res) => {
   }
 });
 
+// ─── RSS 新聞抓取（30分鐘快取，無需 API key）─────────────
+function parseRSSItems(xml, max = 5) {
+  const items = [];
+  const re = /<item>([\s\S]*?)<\/item>/g;
+  let m;
+  while ((m = re.exec(xml)) && items.length < max) {
+    const b = m[1];
+    const get = tag => {
+      const r = b.match(new RegExp(`<${tag}[^>]*>(?:<!\\[CDATA\\[)?([\\s\\S]*?)(?:\\]\\]>)?<\\/${tag}>`, 'i'));
+      return r ? r[1].replace(/<[^>]+>/g, '').trim() : '';
+    };
+    const title = get('title');
+    if (!title || title.toLowerCase().includes('google news')) continue;
+    const rawDate = get('pubDate');
+    let relTime = '';
+    if (rawDate) {
+      const diff = Date.now() - new Date(rawDate).getTime();
+      const h = Math.floor(diff / 3600000);
+      relTime = h < 1 ? '剛剛' : h < 24 ? `${h}小時前` : `${Math.floor(h/24)}天前`;
+    }
+    items.push({ title, link: get('link') || get('guid'), relTime, desc: get('description').slice(0, 80) });
+  }
+  return items;
+}
+
+const RSS_SOURCES = [
+  { key: 'tw_ltc',     label: '🇹🇼 台灣長照',   flag: 'TW', url: 'https://news.google.com/rss/search?q=長照+台灣+政策&hl=zh-TW&gl=TW&ceid=TW:zh-Hant' },
+  { key: 'tw_elder',   label: '👴 銀髮健康',    flag: 'TW', url: 'https://news.google.com/rss/search?q=銀髮+高齡+照護&hl=zh-TW&gl=TW&ceid=TW:zh-Hant' },
+  { key: 'tw_coffee',  label: '☕ 咖啡新知',   flag: 'TW', url: 'https://news.google.com/rss/search?q=台灣+咖啡+精品&hl=zh-TW&gl=TW&ceid=TW:zh-Hant' },
+  { key: 'tw_hualien', label: '🌿 花蓮宜花東', flag: 'TW', url: 'https://news.google.com/rss/search?q=花蓮+宜蘭+台東+健康&hl=zh-TW&gl=TW&ceid=TW:zh-Hant' },
+  { key: 'world_age',  label: '🌍 全球高齡化', flag: 'WD', url: 'https://news.google.com/rss/search?q=elderly+aging+long-term+care&hl=en-US&gl=US&ceid=US:en' },
+  { key: 'world_cog',  label: '🧠 失智研究',   flag: 'WD', url: 'https://news.google.com/rss/search?q=dementia+alzheimer+research+2025&hl=en-US&gl=US&ceid=US:en' },
+  { key: 'world_cafe', label: '🌹 世界咖啡',   flag: 'WD', url: 'https://news.google.com/rss/search?q=specialty+coffee+health+research&hl=en-US&gl=US&ceid=US:en' },
+  { key: 'world_well', label: '💊 全球健康',   flag: 'WD', url: 'https://news.google.com/rss/search?q=WHO+global+health+2025&hl=en-US&gl=US&ceid=US:en' },
+];
+let _newsCache = { ts: 0, data: null };
+
+app.get('/api/news', async (req, res) => {
+  const now = Date.now();
+  if (_newsCache.data && (now - _newsCache.ts) < 30 * 60 * 1000) {
+    return res.json(_newsCache.data);
+  }
+  const results = {};
+  await Promise.allSettled(RSS_SOURCES.map(async src => {
+    try {
+      const r = await fetch(src.url, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; StanleyHealthBot/1.0)' },
+        signal: AbortSignal.timeout(8000)
+      });
+      const xml = await r.text();
+      results[src.key] = { label: src.label, flag: src.flag, items: parseRSSItems(xml, 4) };
+    } catch {
+      results[src.key] = { label: src.label, flag: src.flag, items: [] };
+    }
+  }));
+  _newsCache = { ts: now, data: results };
+  res.json(results);
+});
+
 // ─── 每日長照新知（日期快取，每天只呼叫 NVIDIA 一次）──────
 let _dailyTipCache = { date: null, data: null };
 const DAILY_TOPICS = [
