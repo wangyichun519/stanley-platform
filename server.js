@@ -48,6 +48,10 @@ app.use('/api/training', require('./routes/training'));
 app.use('/api/shop', require('./routes/shop'));
 app.use('/api/linepay', require('./routes/linepay'));
 
+// ─── Threads 自動發文 ─────────────────────────────────
+const threadsModule = require('./routes/threads');
+app.use('/api/threads', threadsModule.router);
+
 // ─── 後台 API（統計資料）───────────────────────────
 app.get('/api/admin/dashboard', basicAuth({
   users: { [process.env.ADMIN_USER || 'stanley']: process.env.ADMIN_PASS || 'admin123' }
@@ -300,6 +304,9 @@ app.get('/api/health', (req, res) => {
 
 // ─── 啟動 ─────────────────────────────────────────────
 app.listen(PORT, () => {
+  // 啟動 Threads 每日自動發文排程
+  threadsModule.startDailyScheduler();
+
   console.log(`
 🌿 Stanley 健康生活品牌平台
 ✅ 伺服器啟動：http://localhost:${PORT}
