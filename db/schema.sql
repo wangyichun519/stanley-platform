@@ -142,11 +142,18 @@ CREATE TABLE IF NOT EXISTS orders (
 
 -- 插入示範課程資料
 INSERT OR IGNORE INTO courses (title, description, date, time, location, duration_hours, price, capacity, category) VALUES
-('失智症照護實務講座', '了解失智症核心症狀、照護技巧與家屬支持策略。適合照服員、家屬及一般民眾參加。', '2026-03-15', '09:00-12:00', '花蓮市（報名後通知地點）', 3, 500, 30, 'dementia'),
-('照服員核心訓練課程', '符合長照3.0規範的照服員完整訓練，90小時結訓核發證書。', '2026-04-01', '09:00-17:00', '花蓮市', 90, 8000, 20, 'caregiver'),
-('感染控制實務課程', '醫護及照護人員必備感控知識，含實作演練。', '2026-03-22', '13:00-19:00', '花蓮市', 6, 800, 25, 'infection'),
-('銀髮咖啡師初級班', '結合SCA精品咖啡知識與認知活化訓練，6週課程，每週六上午。', '2026-04-05', '每週六 09:00-11:00', '花蓮市 Coffee Priority 工作坊', 12, 3800, 12, 'coffee'),
-('漢方養生照護工作坊', '結合中醫養生與現代照護，認識常用中藥材在日常照護中的應用。', '2026-03-29', '14:00-17:00', '花蓮市', 3, 600, 20, 'tcm');
+('失智症照護實務講座', '了解失智症核心症狀、照護技巧與家屬支持策略。適合照服員、家屬及一般民眾參加。', '2026-05-10', '09:00-12:00', '花蓮市（報名後通知地點）', 3, 500, 30, 'dementia'),
+('照服員核心訓練課程', '符合長照3.0規範的照服員完整訓練，90小時結訓核發證書。', '2026-05-18', '09:00-17:00', '花蓮市', 90, 8000, 20, 'caregiver'),
+('感染控制實務課程', '醫護及照護人員必備感控知識，含實作演練。', '2026-04-19', '13:00-17:00', '花蓮市', 4, 800, 25, 'infection'),
+('銀髮咖啡師初級班', '結合SCA精品咖啡知識與認知活化訓練，6週課程，每週六上午。', '2026-04-25', '每週六 09:00-11:00', '花蓮市 Coffee Priority 工作坊', 12, 3800, 12, 'coffee'),
+('漢方養生照護工作坊', '結合中醫養生與現代照護，認識常用中藥材在日常照護中的應用。', '2026-04-12', '14:00-17:00', '花蓮市', 3, 600, 20, 'tcm');
+
+-- 修正已存在但日期過期的示範課程（UPDATE 僅在日期已過今日時觸發）
+UPDATE courses SET date = '2026-05-10' WHERE title = '失智症照護實務講座' AND date < date('now');
+UPDATE courses SET date = '2026-05-18' WHERE title = '照服員核心訓練課程' AND date < date('now');
+UPDATE courses SET date = '2026-04-19' WHERE title = '感染控制實務課程' AND date < date('now');
+UPDATE courses SET date = '2026-04-25' WHERE title = '銀髮咖啡師初級班' AND date < date('now');
+UPDATE courses SET date = '2026-04-12' WHERE title = '漢方養生照護工作坊' AND date < date('now');
 
 -- 插入示範商品資料
 INSERT OR IGNORE INTO products (name, category, description, price, stock, ltc_subsidy) VALUES

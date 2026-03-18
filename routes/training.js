@@ -35,33 +35,47 @@ router.post('/register', async (req, res) => {
   const db = getDb();
   const { course_id, name, id_last4, phone, email, occupation, org, need_receipt, receipt_title } = req.body;
 
-  if (!course_id || !name || !phone || !email) {
+  // 確保 course_id 為整數（前端 element.value 傳來的是字串）
+  const courseId = parseInt(course_id, 10);
+
+  if (!courseId || !name || !phone || !email) {
     return res.status(400).json({ success: false, message: '請填寫所有必填欄位' });
   }
 
   try {
     // 檢查課程是否有名額
-    const course = db.prepare('SELECT * FROM courses WHERE id = ? AND status = "open"').get(course_id);
+    const course = db.prepare("SELECT * FROM courses WHERE id = ? AND status = 'open'").get(courseId);
     if (!course) return res.status(400).json({ success: false, message: '課程不存在或已關閉報名' });
     if (course.registered >= course.capacity) {
       return res.status(400).json({ success: false, message: '課程名額已滿' });
     }
 
-    // 建立報名記錄
+    // 建立報名記錄（統一型別，避免 node:sqlite 型別衝突）
     const result = db.prepare(`
       INSERT INTO registrations (course_id, name, id_last4, phone, email, occupation, org, need_receipt, receipt_title, payment_status)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
-    `).run(course_id, name, id_last4, phone, email, occupation, org, need_receipt ? 1 : 0, receipt_title);
+    `).run(
+      courseId,
+      String(name),
+      String(id_last4 || ''),
+      String(phone),
+      String(email),
+      String(occupation || ''),
+      String(org || ''),
+      need_receipt ? 1 : 0,
+      String(receipt_title || '')
+    );
 
-    res.json({ 
-      success: true, 
+    // 報名成功，直接確認（付款流程稍後另行通知）
+    res.json({
+      success: true,
       registration_id: result.lastInsertRowid,
       course,
-      message: '報名成功！請完成付款以確認名額。' 
+      message: '報名成功！我們將透過 Email 或 LINE 通知您付款方式。'
     });
   } catch (err) {
-    console.error('報名失敗:', err);
-    res.status(500).json({ success: false, message: '系統錯誤，請稍後再試' });
+    console.error('報名失敗:', err.message, err.stack);
+    res.status(500).json({ success: false, message: `系統錯誤：${err.message}` });
   }
 });
 
