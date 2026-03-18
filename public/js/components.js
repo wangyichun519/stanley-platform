@@ -9,6 +9,7 @@ const NAV_LINKS = [
   { href: '/camping.html', label: '🏕️ 療癒露營' },
   { href: '/coffee.html', label: '☕ 咖啡工坊' },
   { href: '/shop.html', label: '🛍️ 選物商店' },
+  { href: '/dashboard.html', label: '🗺️ 情報站' },
 ];
 
 function renderNavbar(activePath) {

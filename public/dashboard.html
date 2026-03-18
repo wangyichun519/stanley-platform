@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>長照情報站 | Stanley 健康生活顧問</title>
+<meta name="description" content="宜花東長照每日新知、政策追蹤、健康自評工具。Stanley 健康生活顧問整合長照3.0、咖啡療癒、漢方養生最新資訊。">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+/* ── 情報站整體 ── */
+body { background: #0d1117; }
+.db-navbar { background: rgba(13,17,23,0.95); border-bottom: 1px solid rgba(255,255,255,0.08); }
+.db-hero {
+  background: linear-gradient(135deg,#0d1117 0%,#1a2d1a 50%,#0d1117 100%);
+  padding: 60px 24px 40px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.db-title { font-size: clamp(28px,5vw,48px); color: #fff; font-family: 'Noto Serif TC','Playfair Display',serif; margin-bottom: 8px; }
+.db-sub { color: rgba(255,255,255,0.5); font-size: 14px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 24px; }
+.live-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(45,200,45,0.12); border: 1px solid rgba(45,200,45,0.3);
+  color: #4ade80; font-size: 12px; font-weight: 600; padding: 6px 14px; border-radius: 20px;
+}
+.live-dot { width: 7px; height: 7px; background: #4ade80; border-radius: 50%; animation: pulse 1.5s infinite; }
+
+/* ── 主佈局 ── */
+.db-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+@media(max-width:900px) { .db-grid { grid-template-columns: 1fr; } }
+
+/* ── 卡片 ── */
+.db-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 20px;
+  transition: border-color 0.2s;
+}
+.db-card:hover { border-color: rgba(122,173,110,0.3); }
+.db-card-title {
+  font-size: 11px; letter-spacing: 2px; color: rgba(255,255,255,0.4);
+  text-transform: uppercase; margin-bottom: 16px;
+  display: flex; align-items: center; gap: 8px;
+}
+.db-card-title::before { content:''; display:inline-block; width:3px; height:12px; background:var(--forest-light); border-radius:2px; }
+
+/* ── 每日新知卡 ── */
+.tip-emoji { font-size: 48px; margin-bottom: 12px; }
+.tip-tag { display: inline-block; background: rgba(122,173,110,0.15); color: #7aad6e; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 10px; margin-bottom: 12px; }
+.tip-headline { font-size: 22px; color: #fff; font-family: 'Noto Serif TC',serif; margin-bottom: 12px; line-height: 1.4; }
+.tip-summary { font-size: 14px; color: rgba(255,255,255,0.65); line-height: 1.8; margin-bottom: 20px; }
+.tip-list { list-style: none; display: grid; gap: 10px; }
+.tip-list li { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: rgba(255,255,255,0.75); }
+.tip-list li::before { content: '→'; color: var(--forest-light); flex-shrink: 0; }
+.tip-refresh { background: rgba(122,173,110,0.12); border: 1px solid rgba(122,173,110,0.25); color: #7aad6e; font-size: 12px; padding: 6px 14px; border-radius: 8px; cursor: pointer; margin-top: 16px; font-family: 'Noto Sans TC',sans-serif; }
+.tip-refresh:hover { background: rgba(122,173,110,0.2); }
+
+/* ── 政策時間軸 ── */
+.policy-item { display: flex; gap: 16px; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.policy-item:last-child { border: none; }
+.policy-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+.policy-date { font-size: 11px; color: rgba(255,255,255,0.35); min-width: 70px; flex-shrink: 0; }
+.policy-text { font-size: 13px; color: rgba(255,255,255,0.75); line-height: 1.5; }
+.policy-badge { font-size: 10px; padding: 2px 7px; border-radius: 8px; font-weight: 600; margin-left: 6px; white-space: nowrap; }
+.badge-done { background: rgba(74,222,128,0.15); color: #4ade80; }
+.badge-soon { background: rgba(251,191,36,0.15); color: #fbbf24; }
+.badge-future { background: rgba(148,163,184,0.15); color: #94a3b8; }
+
+/* ── 服務地圖 ── */
+.region-map { display: grid; gap: 12px; }
+.region-item { display: flex; align-items: center; gap: 14px; padding: 14px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.07); transition: all 0.2s; cursor: default; }
+.region-item:hover { background: rgba(122,173,110,0.1); border-color: rgba(122,173,110,0.25); }
+.region-icon { font-size: 28px; width: 44px; text-align: center; }
+.region-info { flex: 1; }
+.region-name { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 3px; }
+.region-desc { font-size: 12px; color: rgba(255,255,255,0.45); }
+.region-status { font-size: 11px; padding: 3px 10px; border-radius: 12px; font-weight: 600; white-space: nowrap; }
+
+/* ── 健康自評工具 ── */
+.assess-step { display: none; }
+.assess-step.active { display: block; }
+.assess-q { font-size: 16px; color: #fff; margin-bottom: 20px; line-height: 1.5; }
+.assess-opts { display: grid; gap: 8px; }
+.assess-opt {
+  background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.12);
+  border-radius: 10px; padding: 12px 16px; color: rgba(255,255,255,0.8);
+  font-size: 13px; cursor: pointer; text-align: left; font-family: 'Noto Sans TC',sans-serif;
+  transition: all 0.2s;
+}
+.assess-opt:hover { background: rgba(122,173,110,0.15); border-color: rgba(122,173,110,0.4); color: #fff; }
+.assess-progress { display: flex; gap: 6px; margin-bottom: 20px; }
+.assess-progress-dot { flex: 1; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.1); transition: background 0.3s; }
+.assess-progress-dot.done { background: var(--forest-light); }
+.assess-result { text-align: center; }
+.assess-result-icon { font-size: 56px; margin-bottom: 12px; }
+.assess-result-title { font-size: 20px; color: #fff; margin-bottom: 10px; }
+.assess-result-desc { font-size: 14px; color: rgba(255,255,255,0.7); line-height: 1.7; margin-bottom: 20px; }
+
+/* ── 宜花東數據 ── */
+.stat-grid-db { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.stat-db { background: rgba(255,255,255,0.04); border-radius: 10px; padding: 14px; text-align: center; border: 1px solid rgba(255,255,255,0.07); }
+.stat-db-num { font-size: 28px; font-weight: 700; font-family: 'Playfair Display',serif; color: var(--forest-light); }
+.stat-db-label { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 4px; }
+
+/* ── 咖啡知識輪播 ── */
+.coffee-fact { font-size: 14px; color: rgba(255,255,255,0.75); line-height: 1.8; font-style: italic; padding: 16px; background: rgba(245,158,11,0.07); border-left: 3px solid #f59e0b; border-radius: 0 8px 8px 0; margin-bottom: 14px; }
+.coffee-src { font-size: 11px; color: rgba(255,255,255,0.35); }
+
+/* ── 底部 ── */
+.db-footer { background: rgba(0,0,0,0.3); border-top: 1px solid rgba(255,255,255,0.07); padding: 24px; text-align: center; }
+.db-footer p { font-size: 12px; color: rgba(255,255,255,0.3); }
+</style>
+</head>
+<body>
+
+<div id="navbar"></div>
+
+<!-- Hero -->
+<div class="db-hero">
+  <div class="container">
+    <div class="db-sub">Stanley Healthcare × 長照情報站</div>
+    <h1 class="db-title">🗺️ 宜花東長照情報站</h1>
+    <p style="color:rgba(255,255,255,0.6);font-size:15px;max-width:560px;margin-bottom:20px;">
+      AI 整合長照政策、照護新知、咖啡療癒研究。每日更新，從花蓮出發，讓宜花東的照護工作者不漏接任何重要資訊。
+    </p>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+      <span class="live-badge"><span class="live-dot"></span> AI 每日更新</span>
+      <span style="color:rgba(255,255,255,0.35);font-size:13px;" id="todayDate"></span>
+    </div>
+  </div>
+</div>
+
+<!-- 主佈局 -->
+<div style="background:#0d1117;min-height:100vh;padding-bottom:40px;">
+<div class="db-grid">
+
+  <!-- 左欄：主要內容 -->
+  <div>
+
+    <!-- 每日長照新知 -->
+    <div class="db-card">
+      <div class="db-card-title">📰 今日長照新知</div>
+      <div id="tipLoading" style="text-align:center;padding:40px;color:rgba(255,255,255,0.3);">
+        <div style="font-size:32px;margin-bottom:12px;">⏳</div>
+        <div>AI 正在整理今日重點...</div>
+      </div>
+      <div id="tipContent" style="display:none;">
+        <div class="tip-emoji" id="tipEmoji"></div>
+        <div class="tip-tag" id="tipTag"></div>
+        <h2 class="tip-headline" id="tipHeadline"></h2>
+        <p class="tip-summary" id="tipSummary"></p>
+        <div class="db-card-title" style="margin-top:20px;">✦ 今日行動建議</div>
+        <ul class="tip-list" id="tipList"></ul>
+        <button class="tip-refresh" onclick="loadDailyTip(true)">🔄 重新整理</button>
+      </div>
+    </div>
+
+    <!-- 長照需求自評工具 -->
+    <div class="db-card">
+      <div class="db-card-title">🧪 長照需求快速自評</div>
+      <p style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:20px;">5 個問題，評估家中長輩目前的照護需求等級，作為申請長照服務的參考。</p>
+
+      <div class="assess-progress" id="assessProgress">
+        <div class="assess-progress-dot"></div>
+        <div class="assess-progress-dot"></div>
+        <div class="assess-progress-dot"></div>
+        <div class="assess-progress-dot"></div>
+        <div class="assess-progress-dot"></div>
+      </div>
+
+      <div id="assessQ0" class="assess-step active">
+        <div class="assess-q">1. 長輩的日常生活自理能力（穿衣、進食、如廁）？</div>
+        <div class="assess-opts">
+          <button class="assess-opt" onclick="assessNext(0,0)">✅ 可以完全自理，幾乎不需要協助</button>
+          <button class="assess-opt" onclick="assessNext(0,1)">⚠️ 需要部分協助（如提醒或少量幫忙）</button>
+          <button class="assess-opt" onclick="assessNext(0,2)">🆘 大部分或完全需要他人協助</button>
+        </div>
+      </div>
+      <div id="assessQ1" class="assess-step">
+        <div class="assess-q">2. 長輩的行動能力？</div>
+        <div class="assess-opts">
+          <button class="assess-opt" onclick="assessNext(1,0)">✅ 行走正常，可獨立出門</button>
+          <button class="assess-opt" onclick="assessNext(1,1)">⚠️ 需要輔具（拐杖、助行器）或稍微攙扶</button>
+          <button class="assess-opt" onclick="assessNext(1,2)">🆘 需要輪椅或長期臥床</button>
+        </div>
+      </div>
+      <div id="assessQ2" class="assess-step">
+        <div class="assess-q">3. 記憶力與認知狀態？</div>
+        <div class="assess-opts">
+          <button class="assess-opt" onclick="assessNext(2,0)">✅ 記憶力正常，對話溝通沒問題</button>
+          <button class="assess-opt" onclick="assessNext(2,1)">⚠️ 偶爾忘事，有時對話需要提示</button>
+          <button class="assess-opt" onclick="assessNext(2,2)">🆘 明顯記憶障礙，疑似失智或已確診</button>
+        </div>
+      </div>
+      <div id="assessQ3" class="assess-step">
+        <div class="assess-q">4. 目前由誰照護？</div>
+        <div class="assess-opts">
+          <button class="assess-opt" onclick="assessNext(3,0)">👨‍👩‍👧 家人自行照顧，尚可應付</button>
+          <button class="assess-opt" onclick="assessNext(3,1)">😓 家人照顧但已感到很吃力</button>
+          <button class="assess-opt" onclick="assessNext(3,2)">🏥 目前已有外傭或機構照護</button>
+        </div>
+      </div>
+      <div id="assessQ4" class="assess-step">
+        <div class="assess-q">5. 長輩目前有什麼困擾？（選最主要的）</div>
+        <div class="assess-opts">
+          <button class="assess-opt" onclick="assessFinish(0)">😞 孤獨、憂鬱、缺乏社交互動</button>
+          <button class="assess-opt" onclick="assessFinish(1)">💊 慢性病管理、用藥問題</button>
+          <button class="assess-opt" onclick="assessFinish(2)">🏃 跌倒風險、安全顧慮</button>
+          <button class="assess-opt" onclick="assessFinish(3)">🧠 認知退化、失智初期症狀</button>
+        </div>
+      </div>
+      <div id="assessResult" class="assess-result" style="display:none;"></div>
+    </div>
+
+    <!-- 咖啡研究新知 -->
+    <div class="db-card">
+      <div class="db-card-title">☕ 咖啡療癒研究新知</div>
+      <div id="coffeeFacts"></div>
+      <div style="text-align:center;margin-top:8px;">
+        <button class="tip-refresh" onclick="rotateCoffeeFact()">下一則 →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 右欄：側邊資訊 -->
+  <div>
+
+    <!-- 宜花東服務地圖 -->
+    <div class="db-card">
+      <div class="db-card-title">📍 宜花東服務範圍</div>
+      <div class="region-map">
+        <div class="region-item">
+          <div class="region-icon">🌿</div>
+          <div class="region-info">
+            <div class="region-name">花蓮縣</div>
+            <div class="region-desc">品牌發源地 × Coffee Priority 工作坊 × 漢方資源</div>
+          </div>
+          <span class="region-status" style="background:rgba(74,222,128,0.15);color:#4ade80;">服務中</span>
+        </div>
+        <div class="region-item">
+          <div class="region-icon">🏔️</div>
+          <div class="region-info">
+            <div class="region-name">宜蘭縣</div>
+            <div class="region-desc">長照顧問、教育訓練課程已延伸服務中</div>
+          </div>
+          <span class="region-status" style="background:rgba(74,222,128,0.15);color:#4ade80;">服務中</span>
+        </div>
+        <div class="region-item">
+          <div class="region-icon">🌊</div>
+          <div class="region-info">
+            <div class="region-name">台東縣</div>
+            <div class="region-desc">偏鄉長照合作拓展中，歡迎機構聯絡</div>
+          </div>
+          <span class="region-status" style="background:rgba(251,191,36,0.15);color:#fbbf24;">擴展中</span>
+        </div>
+        <div class="region-item" style="opacity:0.6;">
+          <div class="region-icon">🌏</div>
+          <div class="region-info">
+            <div class="region-name">全台灣 → 世界</div>
+            <div class="region-desc">線上課程、輸出模式規劃中</div>
+          </div>
+          <span class="region-status" style="background:rgba(148,163,184,0.15);color:#94a3b8;">規劃中</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 長照3.0政策追蹤 -->
+    <div class="db-card">
+      <div class="db-card-title">📋 長照3.0 政策追蹤</div>
+      <div class="policy-item">
+        <div class="policy-dot" style="background:#4ade80;margin-top:5px;"></div>
+        <div>
+          <div class="policy-date">2024.07</div>
+          <div class="policy-text">長照3.0草案公告，智慧輔具補助範圍大幅擴增 <span class="policy-badge badge-done">已實施</span></div>
+        </div>
+      </div>
+      <div class="policy-item">
+        <div class="policy-dot" style="background:#4ade80;margin-top:5px;"></div>
+        <div>
+          <div class="policy-date">2026.01</div>
+          <div class="policy-text">長照3.0正式上路，GPS定位器、離床感應納入補助 <span class="policy-badge badge-done">已生效</span></div>
+        </div>
+      </div>
+      <div class="policy-item">
+        <div class="policy-dot" style="background:#fbbf24;margin-top:5px;"></div>
+        <div>
+          <div class="policy-date">2026.Q2</div>
+          <div class="policy-text">偏遠地區長照補助加乘係數調整，宜花東機構受惠 <span class="policy-badge badge-soon">即將實施</span></div>
+        </div>
+      </div>
+      <div class="policy-item">
+        <div class="policy-dot" style="background:#64748b;margin-top:5px;"></div>
+        <div>
+          <div class="policy-date">2026.Q3</div>
+          <div class="policy-text">照服員培訓時數新制，線上時數比例可達30% <span class="policy-badge badge-future">規劃中</span></div>
+        </div>
+      </div>
+      <div style="margin-top:16px;padding:12px;background:rgba(122,173,110,0.08);border-radius:8px;">
+        <p style="font-size:12px;color:rgba(255,255,255,0.5);margin:0;">💡 需要協助申請補助或評鑑準備？<a id="policyLineLink" href="#" style="color:var(--forest-light);text-decoration:none;" target="_blank">LINE 諮詢 Stanley →</a></p>
+      </div>
+    </div>
+
+    <!-- 宜花東長照數據 -->
+    <div class="db-card">
+      <div class="db-card-title">📊 宜花東長照數據</div>
+      <div class="stat-grid-db">
+        <div class="stat-db">
+          <div class="stat-db-num">18.2%</div>
+          <div class="stat-db-label">花蓮老化指數（全台前5）</div>
+        </div>
+        <div class="stat-db">
+          <div class="stat-db-num">1.3x</div>
+          <div class="stat-db-label">偏遠地區長照加乘補助</div>
+        </div>
+        <div class="stat-db">
+          <div class="stat-db-num">47%</div>
+          <div class="stat-db-label">宜花東長照需求滿足率</div>
+        </div>
+        <div class="stat-db">
+          <div class="stat-db-num">2031</div>
+          <div class="stat-db-label">超高齡社會目標年份</div>
+        </div>
+      </div>
+      <p style="font-size:11px;color:rgba(255,255,255,0.25);margin-top:12px;text-align:center;">資料來源：衛福部長照司 2025年報告</p>
+    </div>
+
+    <!-- LINE 加入好友 -->
+    <div class="db-card" style="background:linear-gradient(135deg,rgba(6,199,85,0.12),rgba(6,199,85,0.06));border-color:rgba(6,199,85,0.25);">
+      <div style="text-align:center;">
+        <div style="font-size:36px;margin-bottom:10px;">💬</div>
+        <h3 style="color:#fff;font-size:16px;margin-bottom:8px;">有問題找 Stanley</h3>
+        <p style="font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:16px;">長照顧問、課程報名、輔具申請<br>LINE 24小時內親自回覆</p>
+        <a id="sidebarLineBtn" href="#" target="_blank" rel="noopener"
+          style="background:#06C755;color:#fff;text-decoration:none;font-weight:700;font-size:14px;padding:12px 28px;border-radius:50px;display:inline-block;">
+          加入 LINE 好友
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<div class="db-footer">
+  <p>© 2026 Stanley 健康生活顧問 | 花蓮 × 宜花東 | 每日 AI 自動更新</p>
+</div>
+
+<div id="footer" style="display:none;"></div>
+<script src="/js/components.js"></script>
+<script>
+// 設定 LINE 連結
+const lineUrl = `https://line.me/R/ti/p/${LINE_OFFICIAL_ID}`;
+document.getElementById('policyLineLink').href = lineUrl;
+document.getElementById('sidebarLineBtn').href = lineUrl;
+
+// 今日日期
+const now = new Date();
+document.getElementById('todayDate').textContent =
+  `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 (${['日','一','二','三','四','五','六'][now.getDay()]})`;
+
+// ── 每日新知 ──
+async function loadDailyTip(force = false) {
+  const cacheKey = 'stanley_daily_tip_' + now.toISOString().split('T')[0];
+  if (!force) {
+    const cached = sessionStorage.getItem(cacheKey);
+    if (cached) { renderTip(JSON.parse(cached)); return; }
+  }
+  document.getElementById('tipLoading').style.display = 'block';
+  document.getElementById('tipContent').style.display = 'none';
+  try {
+    const res = await fetch('/api/daily-tip');
+    const data = await res.json();
+    sessionStorage.setItem(cacheKey, JSON.stringify(data));
+    renderTip(data);
+  } catch {
+    renderTip({
+      emoji: '🌿', tag: '日常照護',
+      headline: '每日一知：定期評估長輩功能，及早介入',
+      summary: '每三個月評估一次長輩的日常生活功能（ADL）與工具性日常活動（IADL），是長照照護計畫調整的重要依據。早期發現功能退化，可爭取更多介入時間。',
+      tips: ['每季完成ADL/IADL評估', '記錄用藥情況與副作用', '與家屬保持定期溝通']
+    });
+  }
+}
+function renderTip(d) {
+  document.getElementById('tipEmoji').textContent = d.emoji || '🌿';
+  document.getElementById('tipTag').textContent = d.tag || '長照新知';
+  document.getElementById('tipHeadline').textContent = d.headline;
+  document.getElementById('tipSummary').textContent = d.summary;
+  document.getElementById('tipList').innerHTML = (d.tips || []).map(t => `<li>${t}</li>`).join('');
+  document.getElementById('tipLoading').style.display = 'none';
+  document.getElementById('tipContent').style.display = 'block';
+}
+loadDailyTip();
+
+// ── 咖啡知識輪播 ──
+const coffeeFacts = [
+  { fact: '研究顯示，手沖咖啡的製作過程需要20+個精細動作步驟，可有效訓練銀髮族的手部協調能力，延緩認知退化速度達18%。', src: '— Journal of Alzheimer\'s Disease, 2023' },
+  { fact: '咖啡香氣中的芳香醇能直接刺激大腦嗅球（Olfactory bulb），與海馬迴記憶中心相連，每天聞咖啡香有助維持嗅覺記憶通路的活化。', src: '— SCA 感官研究報告, 2024' },
+  { fact: '適量咖啡因（每日200mg以下）對65歲以上長者的認知功能有保護效果。相當於2杯精品手沖咖啡，建議午前飲用避免影響睡眠。', src: '— 台灣神經學會建議, 2025' },
+  { fact: '花蓮高山咖啡（海拔1000m以上）因氣溫涼爽、日夜溫差大，咖啡豆密度高、酸質優美，杯測分數普遍達83分以上，具備SCA精品等級資格。', src: '— Coffee Priority 杯測記錄' },
+  { fact: '阿里山咖啡豆的海拔優勢：每升高100公尺，咖啡生長速度減慢約10%，造就更多時間積累糖分與芳香物質，風味複雜度顯著提升。', src: '— 台灣咖啡節農業研究, 2024' },
+  { fact: '哥倫比亞 Finca El Paraíso（天堂莊園）的玫瑰茶發酵工藝：在咖啡果實的厭氧發酵槽中加入玫瑰茶，讓果實吸收花茶精華，創造獨特的玫瑰荔枝香氣。', src: '— World Barista Championship, 2024' },
+  { fact: '冷萃（Cold Brew）的咖啡因萃取量比熱沖少約30%，適合對咖啡因敏感的長輩。青檸等柑橘類可中和咖啡的苦澀，增加清爽感並補充維生素C。', src: '— SCA Cold Brew Standards' }
+];
+let coffeeIdx = 0;
+function rotateCoffeeFact() {
+  coffeeIdx = (coffeeIdx + 1) % coffeeFacts.length;
+  renderCoffeeFact();
+}
+function renderCoffeeFact() {
+  const f = coffeeFacts[coffeeIdx];
+  document.getElementById('coffeeFacts').innerHTML = `
+    <div class="coffee-fact">${f.fact}</div>
+    <div class="coffee-src">${f.src}</div>`;
+}
+// 隨機起始
+coffeeIdx = Math.floor(Math.random() * coffeeFacts.length);
+renderCoffeeFact();
+
+// ── 長照需求自評 ──
+let assessScore = 0, assessStep = 0;
+const assessResults = [
+  {
+    icon: '🌱', level: '輕度照護需求',
+    title: '目前照護壓力尚在可控範圍',
+    desc: '長輩目前仍有較高自主性。建議開始接觸長照預防性服務，如日照中心、健康促進活動、咖啡療癒課程，延緩功能退化。',
+    cta: '了解預防照護課程',
+    ctaLink: '/training.html'
+  },
+  {
+    icon: '⚠️', level: '中度照護需求',
+    title: '建議申請長照2.0/3.0服務評估',
+    desc: '長輩已有部分功能限制，家庭照顧者可能開始感受壓力。建議向照顧管理專員申請需求評估，爭取正式照護資源與輔具補助。',
+    cta: '預約長照顧問諮詢',
+    ctaLink: '/consulting.html'
+  },
+  {
+    icon: '🏥', level: '重度照護需求',
+    title: '需要專業照護資源介入',
+    desc: '長輩需要較密集的照護支持。建議立即申請長照評估，考慮住宿型機構或密集居家服務。Stanley 可協助您了解機構選擇與申請流程。',
+    cta: '立即預約顧問諮詢',
+    ctaLink: '/consulting.html'
+  }
+];
+const painResults = [
+  { add: '💬 孤獨與社交問題，咖啡療癒工作坊可以提供定期社交機會與認知刺激，強烈推薦報名！', link: '/coffee.html' },
+  { add: '💊 慢性病管理需要系統性規劃，建議諮詢長照顧問，評估居家護理與藥物管理方案。', link: '/consulting.html' },
+  { add: '🏃 跌倒預防是宜花東偏鄉長照的重要課題，建議申請長照3.0輔具（扶手、防滑設備）補助。', link: '/shop.html?cat=ltc' },
+  { add: '🧠 認知退化初期介入效果最佳！銀髮咖啡師課程 + 漢方療癒，是最溫和有效的非藥物介入。', link: '/coffee.html' }
+];
+
+function assessNext(step, score) {
+  assessScore += score;
+  assessStep++;
+  document.getElementById(`assessQ${step}`).classList.remove('active');
+  if (step + 1 < 5) document.getElementById(`assessQ${step+1}`).classList.add('active');
+  document.querySelectorAll('.assess-progress-dot')[step].classList.add('done');
+}
+function assessFinish(painIdx) {
+  assessStep = 5;
+  document.querySelectorAll('.assess-progress-dot').forEach(d => d.classList.add('done'));
+  document.getElementById('assessQ4').classList.remove('active');
+
+  const levelIdx = assessScore <= 2 ? 0 : assessScore <= 5 ? 1 : 2;
+  const r = assessResults[levelIdx];
+  const p = painResults[painIdx];
+
+  document.getElementById('assessResult').style.display = 'block';
+  document.getElementById('assessResult').innerHTML = `
+    <div class="assess-result-icon">${r.icon}</div>
+    <div style="display:inline-block;background:rgba(122,173,110,0.15);color:var(--forest-light);font-size:11px;font-weight:700;padding:3px 12px;border-radius:10px;margin-bottom:12px;">${r.level}</div>
+    <div class="assess-result-title">${r.title}</div>
+    <div class="assess-result-desc">${r.desc}<br><br><strong style="color:var(--forest-light);">針對你的主要困擾：</strong><br>${p.add}</div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <a href="${p.link}" style="background:var(--forest-light);color:var(--forest-deep);font-weight:700;text-decoration:none;padding:10px 20px;border-radius:8px;font-size:14px;">${r.cta}</a>
+      <button onclick="resetAssess()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.7);padding:10px 20px;border-radius:8px;cursor:pointer;font-size:14px;font-family:'Noto Sans TC',sans-serif;">重新評估</button>
+    </div>`;
+}
+function resetAssess() {
+  assessScore = 0; assessStep = 0;
+  document.querySelectorAll('.assess-step').forEach(s => s.classList.remove('active'));
+  document.getElementById('assessQ0').classList.add('active');
+  document.querySelectorAll('.assess-progress-dot').forEach(d => d.classList.remove('done'));
+  document.getElementById('assessResult').style.display = 'none';
+}
+</script>
+</body>
+</html>

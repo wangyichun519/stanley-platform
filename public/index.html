@@ -408,6 +408,55 @@
   </div>
 </section>
 
+<!-- 情報站入口 -->
+<section class="section" style="background:#0d1117;padding:48px 24px;">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:center;max-width:900px;margin:0 auto;">
+      <div>
+        <div style="font-size:11px;letter-spacing:3px;color:var(--forest-light);text-transform:uppercase;margin-bottom:12px;">NEW FEATURE</div>
+        <h2 style="color:#fff;font-size:28px;margin-bottom:12px;line-height:1.3;">🗺️ 宜花東長照情報站</h2>
+        <p style="color:rgba(255,255,255,0.6);font-size:15px;line-height:1.8;margin-bottom:24px;">
+          受 World Monitor 啟發，打造全台首個<strong style="color:#7aad6e;">宜花東長照知識儀表板</strong>。<br>
+          AI 每日更新長照新知、政策追蹤、咖啡研究、服務地圖，還有長照需求自評工具。
+        </p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px;">
+          <span style="background:rgba(122,173,110,0.15);color:#7aad6e;font-size:12px;padding:4px 12px;border-radius:12px;">📰 AI 每日新知</span>
+          <span style="background:rgba(122,173,110,0.15);color:#7aad6e;font-size:12px;padding:4px 12px;border-radius:12px;">🧪 長照需求自評</span>
+          <span style="background:rgba(122,173,110,0.15);color:#7aad6e;font-size:12px;padding:4px 12px;border-radius:12px;">📋 政策追蹤</span>
+          <span style="background:rgba(122,173,110,0.15);color:#7aad6e;font-size:12px;padding:4px 12px;border-radius:12px;">☕ 咖啡研究</span>
+        </div>
+        <a href="/dashboard.html" style="background:var(--forest-light);color:var(--forest-deep);font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:15px;display:inline-block;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+          進入情報站 →
+        </a>
+      </div>
+      <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:24px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div style="background:rgba(122,173,110,0.08);border-radius:10px;padding:16px;border:1px solid rgba(122,173,110,0.15);">
+            <div style="font-size:24px;margin-bottom:6px;">📰</div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.5);">今日主題</div>
+            <div style="font-size:13px;color:#fff;margin-top:4px;" id="homeTipPreview">AI 整理中...</div>
+          </div>
+          <div style="background:rgba(251,191,36,0.08);border-radius:10px;padding:16px;border:1px solid rgba(251,191,36,0.15);">
+            <div style="font-size:24px;margin-bottom:6px;">☕</div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.5);">咖啡知識</div>
+            <div style="font-size:13px;color:#fff;margin-top:4px;">每日輪播 7 則研究新知</div>
+          </div>
+          <div style="background:rgba(59,130,246,0.08);border-radius:10px;padding:16px;border:1px solid rgba(59,130,246,0.15);">
+            <div style="font-size:24px;margin-bottom:6px;">🧪</div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.5);">自評工具</div>
+            <div style="font-size:13px;color:#fff;margin-top:4px;">5題快速評估長照需求</div>
+          </div>
+          <div style="background:rgba(168,85,247,0.08);border-radius:10px;padding:16px;border:1px solid rgba(168,85,247,0.15);">
+            <div style="font-size:24px;margin-bottom:6px;">📍</div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.5);">服務地圖</div>
+            <div style="font-size:13px;color:#fff;margin-top:4px;">宜花東 → 全台灣</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- LINE 加入好友 -->
 <section class="section" style="background:#06C755;padding:60px 24px;">
   <div class="container" style="text-align:center;max-width:600px;">
@@ -442,6 +491,12 @@
 <div id="footer"></div>
 <script src="/js/components.js"></script>
 <script>
+// 首頁情報站預覽：載入今日新知標題
+fetch('/api/daily-tip').then(r=>r.json()).then(d=>{
+  const el = document.getElementById('homeTipPreview');
+  if (el && d.headline) el.textContent = d.headline.slice(0,20) + '…';
+}).catch(()=>{});
+
 // 設定 LINE 連結
 const lineUrl = `https://line.me/R/ti/p/${LINE_OFFICIAL_ID}`;
 const lineBtn = document.getElementById('lineHeroBtn');

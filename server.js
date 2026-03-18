@@ -130,6 +130,92 @@ app.post('/api/coffee-ai', async (req, res) => {
   }
 });
 
+// ─── 每日長照新知（日期快取，每天只呼叫 NVIDIA 一次）──────
+let _dailyTipCache = { date: null, data: null };
+const DAILY_TOPICS = [
+  '台灣長照3.0新制：機構如何提前布局智慧輔具申請',
+  '咖啡療癒的最新研究：改善銀髮族認知功能的實證',
+  '失智症初期照護：家屬最常忽略的五個照護細節',
+  '宜花東偏鄉長照：如何善用偏遠地區加乘補助',
+  '漢方養生融入現代照護：中醫師給照服員的建議',
+  '感染控制在長照機構：後疫情時代的新標準',
+  '銀髮族睡眠品質與咖啡因：SCA Q Grader 的專業建議',
+  '三代同堂照護模式：家庭照護者的身心健康維護',
+  '長照評鑑準備：SNQ 國家品質標章如何加分',
+  '花蓮在地農業療癒：結合自然環境的照護新趨勢'
+];
+
+app.get('/api/daily-tip', async (req, res) => {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    if (_dailyTipCache.date === today && _dailyTipCache.data) {
+      return res.json(_dailyTipCache.data);
+    }
+
+    const dayIdx = Math.floor((Date.now() / 86400000)) % DAILY_TOPICS.length;
+    const topic = DAILY_TOPICS[dayIdx];
+
+    const response = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.NVIDIA_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'meta/llama-3.1-8b-instruct',
+        messages: [
+          {
+            role: 'system',
+            content: '你是台灣長照與健康照護領域的實務專家，熟悉長照政策、咖啡療癒、銀髮照護。請以繁體中文，輸出純 JSON（不要有 markdown 格式）。'
+          },
+          {
+            role: 'user',
+            content: `請針對主題「${topic}」，輸出今日（${today}）長照健康新知，格式如下（純JSON）：
+{"headline":"15-20字的吸引人標題","summary":"100字左右的精要內容，包含實用資訊","tips":["具體可執行的建議1","具體建議2","具體建議3"],"tag":"主題分類（如：長照政策、咖啡療癒、失智照護、漢方養生、偏鄉長照）","emoji":"一個最相關的 emoji"}`
+          }
+        ],
+        temperature: 0.8,
+        max_tokens: 500
+      })
+    });
+
+    let tipData;
+    if (response.ok) {
+      const aiData = await response.json();
+      const content = aiData.choices?.[0]?.message?.content || '';
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        try { tipData = JSON.parse(jsonMatch[0]); } catch {}
+      }
+    }
+
+    if (!tipData) {
+      tipData = {
+        headline: '長照3.0智慧輔具：讓照護更輕鬆',
+        summary: '長照3.0補助輔具範圍擴大，包含AI離床感應器、GPS定位器等智慧型設備。機構申請需備妥照顧計畫書與評估報告，建議提前三個月準備。宜花東地區可加申請偏遠加乘補助，節省更多費用。',
+        tips: ['提前備妥照顧計畫書與評估報告', '確認輔具供應商具備長照3.0合格資格', '偏遠地區可申請額外加乘補助費'],
+        tag: '長照政策',
+        emoji: '🏥'
+      };
+    }
+    tipData.date = today;
+    tipData.topic = topic;
+
+    _dailyTipCache = { date: today, data: tipData };
+    res.json(tipData);
+  } catch (e) {
+    console.error('daily-tip error:', e);
+    res.json({
+      headline: '每日長照小知識',
+      summary: '定期評估長輩的日常生活功能（ADL），是照護計畫調整的重要依據。與家屬保持良好溝通，有助提升照護品質與家屬滿意度。',
+      tips: ['每月評估一次ADL量表', '建立照護日誌記錄異常', '定期與醫師討論用藥情況'],
+      tag: '日常照護',
+      emoji: '🌿',
+      date: new Date().toISOString().split('T')[0]
+    });
+  }
+});
+
 // ─── 測試信件 ─────────────────────────────────────────
 app.get('/api/test-email', async (req, res) => {
   const { sendConsultingConfirm } = require('./routes/mailer');
