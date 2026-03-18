@@ -1,12 +1,18 @@
-// routes/mailer.js - Email 通知服務
+// routes/mailer.js - Email 通知服務（Nodemailer + Gmail port 587）
 const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false,
+  requireTLS: true,
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
+    pass: (process.env.EMAIL_PASS || '').replace(/\s/g, '') // 移除應用程式密碼中的空格
+  },
+  tls: { rejectUnauthorized: false },
+  connectionTimeout: 15000,
+  socketTimeout: 15000
 });
 
 const BRAND = 'Stanley 健康生活顧問';
