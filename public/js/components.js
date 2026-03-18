@@ -1,8 +1,6 @@
 // public/js/components.js - 共用導覽列與頁尾
 
-// ⚠️ 請到 LINE Official Account Manager → 帳號設定 → 基本設定 → LINE ID 查詢
-// 找到你的 LINE ID (例如 @abc1234)，填入下方
-const LINE_OFFICIAL_ID = '@stanley_hualien'; // ← 改成你的正確 LINE Official Account ID
+const LINE_OFFICIAL_ID = '@248dkahj'; // LINE 官方帳號 ID
 
 const NAV_LINKS = [
   { href: '/index.html', label: '首頁' },
