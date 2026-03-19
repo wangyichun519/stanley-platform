@@ -328,6 +328,81 @@ function startDailyScheduler() {
   console.log('[Threads] 自動發文排程已啟動 ✅');
 }
 
+// ─── OAuth 授權（一次性取得 Token）──────────────────────────
+const APP_ID       = process.env.THREADS_APP_ID     || '1679750820036491';
+const APP_SECRET   = process.env.THREADS_APP_SECRET || '';
+const REDIRECT_URI = `${SITE_URL}/api/threads/callback`;
+
+// 開始授權：手機開這個網址 → 跳到 Threads 授權頁
+router.get('/auth/start', (req, res) => {
+  const url = new URL('https://threads.net/oauth/authorize');
+  url.searchParams.set('client_id', APP_ID);
+  url.searchParams.set('redirect_uri', REDIRECT_URI);
+  url.searchParams.set('scope', 'threads_basic,threads_content_publish');
+  url.searchParams.set('response_type', 'code');
+  res.redirect(url.toString());
+});
+
+// 授權回調：自動換 Token，把結果顯示在畫面上，讓你複製到 Railway
+router.get('/callback', async (req, res) => {
+  const { code, error } = req.query;
+  if (error || !code) {
+    return res.send(`<h2 style="color:red">授權失敗：${error || '未收到授權碼'}</h2><a href="/">回首頁</a>`);
+  }
+  try {
+    // 換短效 Token
+    const tokenRes = await fetch('https://graph.threads.net/oauth/access_token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ client_id: APP_ID, client_secret: APP_SECRET,
+        grant_type: 'authorization_code', redirect_uri: REDIRECT_URI, code }).toString()
+    });
+    const tokenData = await tokenRes.json();
+    if (!tokenData.access_token) {
+      return res.send(`<h2>換取失敗</h2><pre>${JSON.stringify(tokenData, null, 2)}</pre>`);
+    }
+
+    // 換長效 Token（60天）
+    const longRes = await fetch(
+      `https://graph.threads.net/access_token?grant_type=th_exchange_token&client_id=${APP_ID}&client_secret=${APP_SECRET}&access_token=${tokenData.access_token}`
+    );
+    const longData = await longRes.json();
+    const finalToken = longData.access_token || tokenData.access_token;
+    const expiresAt  = new Date(Date.now() + (longData.expires_in || 5183944) * 1000).toLocaleDateString('zh-TW');
+
+    // 顯示結果讓使用者複製到 Railway Variables
+    res.send(`<!DOCTYPE html><html lang="zh-TW"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Threads 授權完成</title>
+<style>body{font-family:sans-serif;background:#f5f0e8;padding:24px;max-width:600px;margin:0 auto}
+.box{background:#fff;border-radius:12px;padding:28px;margin-bottom:20px;box-shadow:0 4px 16px rgba(0,0,0,.08)}
+h2{color:#2D4A2D;margin-top:0}label{font-size:13px;color:#888;font-weight:bold}
+pre{background:#1a1a2e;color:#00ff88;padding:16px;border-radius:8px;word-break:break-all;white-space:pre-wrap;font-size:13px;user-select:all}
+.step{background:#e8f5e8;border-left:4px solid #2D4A2D;padding:12px 16px;border-radius:4px;margin-bottom:12px;font-size:14px}
+</style></head><body>
+<div class="box">
+  <h2>✅ Threads 授權成功！</h2>
+  <p>請把以下兩個值複製到 <strong>Railway → Variables</strong></p>
+
+  <label>THREADS_USER_ID（複製這串數字）</label>
+  <pre>${tokenData.user_id}</pre>
+
+  <label>THREADS_ACCESS_TOKEN（複製這串長 Token，有效至 ${expiresAt}）</label>
+  <pre>${finalToken}</pre>
+</div>
+<div class="box">
+  <h2>📋 接下來怎麼做</h2>
+  <div class="step">① 複製上方兩個值</div>
+  <div class="step">② 開啟 Railway → 你的 Service → Variables</div>
+  <div class="step">③ 新增 <strong>THREADS_USER_ID</strong> 和 <strong>THREADS_ACCESS_TOKEN</strong></div>
+  <div class="step">④ 儲存 → Railway 自動重啟 → 每天 09:00 開始自動發文 🎉</div>
+</div>
+</body></html>`);
+  } catch (err) {
+    res.send(`<h2>系統錯誤</h2><p>${err.message}</p>`);
+  }
+});
+
 // ─── 管理 API 端點 ─────────────────────────────────────────
 
 // 查看狀態（admin）
