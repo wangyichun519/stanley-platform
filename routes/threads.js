@@ -81,8 +81,7 @@ const FALLBACK_POSTS = [
 
 研究顯示，咖啡手沖過程中的嗅覺刺激、手部精細動作與專注儀式，對銀髮族的認知活化有顯著幫助。每個週日早晨，不妨邀長輩一起參與手沖的小小儀式——不只是喝咖啡，更是一場溫柔的腦部運動。
 
-☕ Coffee Priority 工作坊定期開課，歡迎了解！
-👉 SITE/coffee.html
+☕ Coffee Priority 工作坊定期開課，歡迎透過 LINE 或 Email 聯繫我們！
 
 #咖啡療癒 #銀髮生活 #CoffeePriority #花蓮咖啡 #週日早晨`,
 
@@ -93,8 +92,7 @@ const FALLBACK_POSTS = [
 
 宜花東偏鄉機構另有加乘補助，申請成功最高可再減輕自費負擔。建議提前 3 個月備妥：①照顧計畫書 ②評估報告 ③合格輔具清單。
 
-需要申請輔導？歡迎預約顧問諮詢！
-👉 SITE/consulting.html
+需要申請輔導？歡迎透過 LINE 或 Email 預約顧問諮詢！
 
 #長照3 #台灣長照 #銀髮健康 #StanleyHealthcare #宜花東`,
 
@@ -105,8 +103,7 @@ const FALLBACK_POSTS = [
 
 哥倫比亞天堂莊園（Finca El Paraíso）將採收的咖啡果實與玫瑰花瓣共同發酵，讓咖啡豆在發酵過程中吸收玫瑰的花香與果酸，最終呈現出玫瑰、荔枝、茉莉的複雜風味層次。
 
-每一口都像在品嚐一朵盛開的玫瑰——這就是精品咖啡的魔法。目前限量進口，有興趣歡迎詢問！
-👉 SITE/coffee.html
+每一口都像在品嚐一朵盛開的玫瑰——這就是精品咖啡的魔法。目前限量進口，有興趣歡迎透過 LINE 或 Email 詢問！
 
 #精品咖啡 #SCAQGrader #CoffeePriority #花蓮咖啡 #手沖咖啡`,
 
@@ -122,8 +119,7 @@ const FALLBACK_POSTS = [
 ✅ 結業頒發學習證明
 
 讓長輩在咖啡香中，找回生活的期待感。
-目前僅剩少量名額，歡迎提前預約報名！
-👉 SITE/training.html
+目前僅剩少量名額，歡迎透過 LINE 或 Email 提前預約報名！
 
 #銀髮咖啡師 #長照培訓 #咖啡課程 #花蓮課程 #認知活化`,
 
@@ -136,7 +132,7 @@ const FALLBACK_POSTS = [
 他扶芽農莊堅持全程有機栽培，不施農藥、不用化學肥料，保留最純粹的山林風土。每一批豆都由 SCA Q Grader 親自杯測，確保穩定品質。
 
 這是台灣本土精品咖啡值得驕傲的一支。
-NT$780/150g 👉 SITE/shop.html
+NT$780/150g，有興趣歡迎透過 LINE 或 Email 洽詢！
 
 #台灣精品咖啡 #有機咖啡 #阿里山咖啡 #CoffeePriority #選豆攻略`,
 
@@ -201,7 +197,7 @@ async function generatePostContent(dayOfWeek) {
 1. 開頭固定用：「${theme.intro}」
 2. 主題方向：${theme.topic}
 3. 內文 150～180 字，分段清晰，包含 1 個具體實用資訊
-4. 中段自然帶入品牌，加上：「了解更多 👉 ${SITE_URL}${theme.page}」
+4. 中段自然帶入品牌，結尾引導讀者「歡迎透過 LINE 或 Email 聯繫我們」，不放任何網址
 5. 結尾加：「${theme.tags}」
 6. 全文（含 hashtags）不超過 480 字
 7. 只輸出貼文，不加說明`
