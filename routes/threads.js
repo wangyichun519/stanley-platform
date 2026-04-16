@@ -426,8 +426,19 @@ router.get('/status', adminAuth, (req, res) => {
   });
 });
 
-// 手動立即發文（admin，可指定 day 0-6）
+// 手動立即發文（admin，可指定 day 0-6 或傳入自訂 text）
 router.post('/trigger', adminAuth, async (req, res) => {
+  // 若傳入自訂文字，直接發布不走 AI 生成
+  if (req.body.text) {
+    try {
+      const result = await postToThreads(req.body.text);
+      const today = new Date().toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei' });
+      _lastPost = { date: today, success: true, postId: result.postId, error: null, text: req.body.text };
+      return res.json(_lastPost);
+    } catch (err) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
   const forceDay = req.body.day !== undefined ? parseInt(req.body.day, 10) : null;
   if (forceDay !== null && (forceDay < 0 || forceDay > 6)) {
     return res.status(400).json({ success: false, message: 'day 必須是 0-6' });
