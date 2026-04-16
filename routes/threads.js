@@ -169,35 +169,25 @@ const FALLBACK_POSTS = [
 #漢方養生 #中醫保健 #天然草本 #銀髮養生 #StanleyHealthcare`
 ];
 
-// ─── AI 生成貼文（NVIDIA NIM）────────────────────────────
+// ─── AI 生成貼文（Claude API）────────────────────────────
 async function generatePostContent(dayOfWeek) {
   const theme = WEEKLY_THEMES[dayOfWeek];
   const fallback = FALLBACK_POSTS[dayOfWeek].replace(/SITE/g, SITE_URL);
 
-  if (!process.env.NVIDIA_API_KEY) return fallback;
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) {
+    console.log('[Threads] 未設定 ANTHROPIC_API_KEY，使用靜態備用文');
+    return fallback;
+  }
 
   const today = new Date().toLocaleDateString('zh-TW', {
     timeZone: 'Asia/Taipei',
     year: 'numeric', month: 'long', day: 'numeric', weekday: 'long'
   });
 
-  try {
-    const res = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.NVIDIA_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: 'qwen/qwen2.5-72b-instruct',
-        messages: [
-          {
-            role: 'system',
-            content: `你是 Stanley 的 Threads 社群小編，正在籌備一個結合精品咖啡、銀髮長照與漢方養生的品牌，品牌名稱為「Coffee Priority」，基地在花蓮。目前品牌仍在籌備階段，尚未正式成立公司或開業，所以發文語氣是「個人分享知識與理念」，而不是「公司宣傳」。絕對不可以用「歡迎來電」「預約諮詢」「立即購買」「目前開課」「名額有限」等已開業的說法。語氣：真誠、有溫度、像在跟朋友聊天，偶爾帶點故事感。只輸出貼文本文，不加任何說明或引號。`
-          },
-          {
-            role: 'user',
-            content: `今天是${today}。請寫一則 Threads 貼文，主題「${theme.label}」。
+  const systemPrompt = `你是 Stanley 的 Threads 社群小編，正在籌備一個結合精品咖啡、銀髮長照與漢方養生的品牌，品牌名稱為「Coffee Priority」，基地在花蓮。目前品牌仍在籌備階段，尚未正式成立公司或開業，所以發文語氣是「個人分享知識與理念」，而不是「公司宣傳」。絕對不可以用「歡迎來電」「預約諮詢」「立即購買」「目前開課」「名額有限」等已開業的說法。語氣：真誠、有溫度、像在跟朋友聊天，偶爾帶點故事感。只輸出貼文本文，不加任何說明或引號。`;
+
+  const userPrompt = `今天是${today}。請寫一則 Threads 貼文，主題「${theme.label}」。
 
 內容要求：
 1. 開頭固定用：「${theme.intro}」
@@ -207,21 +197,34 @@ async function generatePostContent(dayOfWeek) {
 5. 結尾邀請讀者留言互動，例如：「你有類似的經驗嗎？歡迎留言聊聊 💬」
 6. 最後加上：「${theme.tags}」
 7. 全文（含 hashtags）不超過 480 字
-8. 只輸出貼文，不加說明`
-          }
-        ],
-        temperature: 0.82,
-        max_tokens: 600
+8. 只輸出貼文，不加說明`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 700,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userPrompt }]
       }),
-      signal: AbortSignal.timeout(15000)
+      signal: AbortSignal.timeout(20000)
     });
 
-    if (!res.ok) return fallback;
+    if (!res.ok) {
+      const err = await res.text();
+      console.error('[Threads] Claude API 錯誤:', err);
+      return fallback;
+    }
 
     const data = await res.json();
-    const text = (data.choices?.[0]?.message?.content || '').trim();
+    const text = (data.content?.[0]?.text || '').trim();
 
-    // 確保不超過 Threads 500 字上限
     if (text.length >= 50 && text.length <= 500) return text;
     if (text.length > 500) return text.slice(0, 465) + '...\n\n' + theme.tags;
   } catch (err) {
